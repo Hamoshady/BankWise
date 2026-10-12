@@ -1,0 +1,27 @@
+﻿.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+data/
+output_cards/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+
+# Identity images and local image data
+*.jpg
+*.jpeg
+*.png
+
+# Test and runtime artifacts
+.coverage
+htmlcov/
+*.log
