@@ -1,0 +1,9 @@
+﻿services:
+  bankwise:
+    build: .
+    image: bankwise-ai:local
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data:ro
+      - ./output_cards:/app/output_cards
