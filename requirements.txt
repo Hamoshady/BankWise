@@ -1,0 +1,20 @@
+# BankWise AI - local EasyOCR pipeline for Egyptian national ID cards
+#
+# torch / torchvision are intentionally NOT listed: keep the CUDA build that is already
+# installed and working (RTX 4060). `pip install -r requirements.txt` will not replace it as
+# long as the installed torch satisfies easyocr's requirement. Never install a CPU-only wheel
+# over it. Check with:  python -m id_ocr.cli check-env --verify-gpu
+#
+# Versions this code was exercised with (Python 3.13 sandbox, CPU): easyocr 1.7.2,
+# numpy 2.5, opencv 5.0. The syntax is checked for Python 3.10. The GPU path
+# itself has NOT been run by the author (no NVIDIA GPU in the build sandbox).
+
+easyocr>=1.7.1
+numpy>=1.23
+
+# OpenCV: easyocr already depends on opencv-python-headless. If your environment already has
+# `opencv-python`, keep it - do not install both packages side by side.
+# opencv-python-headless>=4.8
+
+# Tests
+pytest>=7.4

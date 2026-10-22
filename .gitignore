@@ -1,27 +1,27 @@
-﻿.env
-.env.*
-!.env.example
-*.pem
-*.key
+# Personal data - real ID photos, their transcribed labels, and any generated results/crops
+test_data/*.jpg
+test_data/*.jpeg
+test_data/*.png
+test_data/ground_truth.json
+outputs/
+debug*/
 
-data/
-output_cards/
-.pytest_cache/
 __pycache__/
-*.py[cod]
+*.pyc
+.pytest_cache/
+.EasyOCR/
+models/
+
+# Virtual environments and secrets
 .venv/
 venv/
-dist/
+.env
+.env.*
+!.env.example
+
+# Python build artifacts
 build/
+dist/
 *.egg-info/
-
-
-# Identity images and local image data
-*.jpg
-*.jpeg
-*.png
-
-# Test and runtime artifacts
 .coverage
 htmlcov/
-*.log
