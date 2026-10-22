@@ -1,0 +1,4 @@
+# Application logging. Overridable with BANKWISE_LOG_LEVEL and BANKWISE_LOG_FORMAT.
+level: INFO            # DEBUG | INFO | WARNING | ERROR | CRITICAL
+format: json           # json | console
+max_message_chars: 2000

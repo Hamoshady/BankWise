@@ -18,3 +18,5 @@ numpy>=1.23
 
 # Tests
 pytest>=7.4
+
+PyYAML>=6.0

@@ -1,0 +1,22 @@
+# Application-wide settings. OCR-specific settings do not belong here.
+#
+# The environment is NOT set in this file: use BANKWISE_ENV=development|production. If it is unset the
+# application assumes production. Secrets are never stored in files; see .env.example.
+
+secrets:
+  # Secrets that must be present AND strong (>= 32 characters, no placeholder text) when running in
+  # production. Nothing in the repository needs a secret yet. Add jwt_secret here when authentication
+  # is implemented.
+  required_in_production: []
+
+# In-memory limits for development and tests. Not shared across processes (see core/rate_limit.py).
+rate_limits:
+  auth_attempt:
+    limit: 5
+    window_seconds: 60
+  identity_submit:
+    limit: 10
+    window_seconds: 60
+  expensive:
+    limit: 2
+    window_seconds: 60

@@ -1,0 +1,24 @@
+# Role-based access control. Anything not granted here is denied.
+# A role grants exact permissions or a whole domain with "domain:*". Every permission a role grants must be
+# listed under `permissions`. Note: `admin` deliberately does NOT include identity:view_sensitive.
+
+permissions:
+  - identity:submit
+  - identity:read
+  - identity:view_sensitive
+  - identity:review
+  - audit:read
+  - admin:manage
+
+roles:
+  operator:
+    - identity:submit
+    - identity:read
+  reviewer:
+    - identity:read
+    - identity:review
+    - identity:view_sensitive
+  auditor:
+    - audit:read
+  admin:
+    - "admin:*"
