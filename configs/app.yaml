@@ -5,9 +5,24 @@
 
 secrets:
   # Secrets that must be present AND strong (>= 32 characters, no placeholder text) when running in
-  # production. Nothing in the repository needs a secret yet. Add jwt_secret here when authentication
-  # is implemented.
-  required_in_production: []
+  # production. The token service signs with jwt_secret (BANKWISE_JWT_SECRET).
+  required_in_production: [jwt_secret]
+
+# Access tokens (core/auth.py). HS256 is the only algorithm accepted. Keep the lifetime short: roles are
+# carried in the token and a role change only takes effect when the token expires or is revoked.
+auth:
+  issuer: bankwise
+  audience: bankwise-api
+  access_token_ttl_seconds: 900    # 60 - 86400
+  leeway_seconds: 10               # clock skew tolerance, 0 - 60
+
+# Short-lived private storage for sensitive uploads (core/storage.py). Relative paths resolve against the
+# process working directory; outputs/ is git-ignored. Files expire after ttl_seconds once purge_expired() runs.
+storage:
+  base_dir: outputs/secure
+  ttl_seconds: 3600
+  max_bytes: 10485760              # 10 MiB
+  max_files: 1000                  # refuses new uploads beyond this many files
 
 # In-memory limits for development and tests. Not shared across processes (see core/rate_limit.py).
 rate_limits:
@@ -20,3 +35,15 @@ rate_limits:
   expensive:
     limit: 2
     window_seconds: 60
+
+# Durable, tamper-evident audit file (core/audit.py HashChainedFileAuditSink). Needs BANKWISE_AUDIT_HMAC_KEY.
+# Production start-up (core/bootstrap.py) refuses to run without this section. Single process only.
+audit:
+  base_dir: outputs/audit
+  filename: audit.jsonl
+  max_bytes: 52428800              # 50 MiB; writes FAIL when full (nothing is dropped or rotated silently)
+
+# Operator statement for production: exactly one application process runs. Rate limits and token revocation
+# live in that process's memory; set to true only if that is really the deployment. Leave false/absent otherwise.
+deployment:
+  single_process: false

@@ -11,6 +11,7 @@ import json
 import logging
 import re
 import sys
+import threading
 import traceback
 import uuid
 from collections.abc import Mapping
@@ -176,3 +177,23 @@ def get_logger(name: str = "") -> logging.Logger:
 def log_event(logger: logging.Logger, level: int, event: str, **fields: Any) -> None:
     """Log a short, constant event name plus structured fields (redacted by the handler filter)."""
     logger.log(level, event, extra={"fields": fields})
+
+
+def install_safe_excepthook() -> None:
+    """Replace the default uncaught-exception printer, which writes the raw exception message (possibly containing
+    an ID number or a name) and traceback to stderr. Uncaught exceptions are logged through the redacting handler
+    and only a generic line is printed. If `configure_logging` has not been called, nothing is logged at all
+    (the standard fallback handler would print unredacted text) and only the generic line is printed."""
+    def hook(exc_type, exc, tb) -> None:
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc, tb)
+            return
+        if any(getattr(h, "_bankwise_managed", False) for h in logging.getLogger(LOGGER_NAME).handlers):
+            get_logger("uncaught").critical("uncaught exception", exc_info=(exc_type, exc, tb))
+            note = "details were written to the application log"
+        else:
+            note = "logging is not configured, so no details were recorded"
+        sys.stderr.write(f"An unexpected error occurred; {note}.\n")
+
+    sys.excepthook = hook
+    threading.excepthook = lambda args: hook(args.exc_type, args.exc_value, args.exc_traceback)

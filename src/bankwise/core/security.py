@@ -6,6 +6,7 @@ Principals for real callers. This module only answers "is this principal allowed
 deny unless a configured role grants the permission."""
 from __future__ import annotations
 
+import errno
 import logging
 import os
 import re
@@ -22,6 +23,8 @@ _PERMISSION_RE = re.compile(r"^[a-z][a-z_]*:[a-z][a-z_]*$")
 _WILDCARD_RE = re.compile(r"^[a-z][a-z_]*:\*$")
 _ROLE_RE = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
 _SUBJECT_RE = re.compile(r"^[A-Za-z0-9_.:@-]{1,64}$")
+MAX_OUTPUT_BYTES = 5 * 1024 * 1024
+_FORBIDDEN_NAME_CHARS = frozenset('<>:"|?*')            # ':' also blocks NTFS alternate data streams ("a.txt:hidden")
 _WINDOWS_RESERVED = frozenset({"con", "prn", "aux", "nul"} | {f"com{i}" for i in range(1, 10)}
                               | {f"lpt{i}" for i in range(1, 10)})
 _log = logging.getLogger("bankwise.security")
@@ -149,7 +152,8 @@ def safe_output_path(base_dir: "str | os.PathLike[str]", relative: "str | os.Pat
     if not parts:
         raise InvalidInputError("output path is empty")
     for part in parts:
-        if part == ".." or part != part.rstrip(" .") or part.split(".")[0].lower() in _WINDOWS_RESERVED:
+        if part == ".." or part != part.rstrip(" .") or part.split(".")[0].lower() in _WINDOWS_RESERVED \
+                or any(char in _FORBIDDEN_NAME_CHARS or ord(char) < 32 for char in part):
             raise InvalidInputError("output path contains a forbidden component")
     base = Path(base_dir).resolve()
     target = base.joinpath(*parts).resolve()
@@ -158,14 +162,32 @@ def safe_output_path(base_dir: "str | os.PathLike[str]", relative: "str | os.Pat
     return target
 
 
-def write_private_text(path: Path, text: str, overwrite: bool = False, encoding: str = "utf-8") -> None:
+def write_private_text(path: Path, text: str, overwrite: bool = False, encoding: str = "utf-8",
+                       max_bytes: int = MAX_OUTPUT_BYTES) -> None:
     """Create a file readable only by its owner (mode 0o600 on POSIX; Windows only honours the read-only
-    bit, so rely on directory ACLs there). Refuses to overwrite unless `overwrite=True`."""
+    bit, so rely on directory ACLs there). Refuses to overwrite unless `overwrite=True`, refuses to follow a
+    symbolic link at the final path component (POSIX), caps the size, writes bytes (no newline translation) and
+    removes a half-written file if the write fails."""
+    data = text.encode(encoding)
+    if len(data) > max_bytes:
+        raise InvalidInputError("output is too large")
     path.parent.mkdir(parents=True, exist_ok=True)
-    flags = os.O_WRONLY | os.O_CREAT | (os.O_TRUNC if overwrite else os.O_EXCL)
+    flags = os.O_WRONLY | os.O_CREAT | (os.O_TRUNC if overwrite else os.O_EXCL) \
+        | getattr(os, "O_NOFOLLOW", 0) | getattr(os, "O_BINARY", 0)
     try:
         descriptor = os.open(path, flags, 0o600)
     except FileExistsError:
         raise InvalidInputError("output file already exists") from None
-    with os.fdopen(descriptor, "w", encoding=encoding) as handle:
-        handle.write(text)
+    except OSError as error:
+        if error.errno == errno.ELOOP:
+            raise InvalidInputError("output path is a symbolic link") from None
+        raise
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(data)
+    except BaseException:
+        try:
+            path.unlink()
+        except OSError:
+            pass
+        raise

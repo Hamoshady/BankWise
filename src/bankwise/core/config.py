@@ -17,11 +17,14 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 import yaml
 
+from bankwise.core.audit import AuditSettings
+from bankwise.core.auth import AuthSettings
 from bankwise.core.errors import ConfigError
 from bankwise.core.logging import VALID_FORMATS, VALID_LEVELS, LoggingSettings
 from bankwise.core.pii import Sensitive, register_secret_value
 from bankwise.core.rate_limit import RateLimit
 from bankwise.core.security import RbacPolicy
+from bankwise.core.storage import StorageSettings
 
 CONFIG_DIR_ENV = "BANKWISE_CONFIG_DIR"
 ENVIRONMENT_ENV = "BANKWISE_ENV"
@@ -30,11 +33,26 @@ LOG_FORMAT_ENV = "BANKWISE_LOG_FORMAT"
 SECRET_ENV_VARS: Dict[str, str] = {
     "jwt_secret": "BANKWISE_JWT_SECRET",
     "pii_hmac_key": "BANKWISE_PII_HMAC_KEY",
+    "audit_hmac_key": "BANKWISE_AUDIT_HMAC_KEY",
 }
+MAX_CONFIG_BYTES = 256 * 1024
 MIN_SECRET_LENGTH = 32
 MIN_DISTINCT_CHARACTERS = 8
 PLACEHOLDER_MARKERS = ("your_", "changeme", "change_me", "replace_me", "placeholder", "example")
 _POLICY_NAME_RE = re.compile(r"^[a-z][a-z0-9_]{0,39}$")
+
+
+@dataclass(frozen=True)
+class DeploymentSettings:
+    """`single_process` is an explicit statement by the operator that exactly ONE application process runs.
+    Production start-up refuses to proceed without it, because rate limits and token revocations are kept in that
+    process's memory (see bootstrap.py)."""
+
+    single_process: bool = False
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.single_process, bool):
+            raise ConfigError("deployment single_process must be true or false")
 
 
 class Environment(str, Enum):
@@ -47,6 +65,10 @@ class AppConfig:
     environment: Environment
     required_secrets: Tuple[str, ...]
     rate_limits: Mapping[str, RateLimit]
+    auth: Optional[AuthSettings] = None
+    storage: Optional[StorageSettings] = None
+    audit: Optional[AuditSettings] = None
+    deployment: Optional[DeploymentSettings] = None
 
     @property
     def is_production(self) -> bool:
@@ -73,8 +95,12 @@ def config_dir(environ: Optional[Mapping[str, str]] = None) -> Path:
 
 def read_yaml(path: Path) -> Dict[str, Any]:
     try:
+        if path.stat().st_size > MAX_CONFIG_BYTES:
+            raise ConfigError(f"config file '{path.name}' is too large")
         with open(path, "r", encoding="utf-8") as handle:
             data = yaml.load(handle, Loader=_UniqueKeyLoader)
+    except ConfigError:
+        raise
     except (OSError, yaml.YAMLError, TypeError, ValueError, UnicodeDecodeError) as error:
         raise ConfigError(f"cannot read config file '{path.name}': {type(error).__name__}") from None
     if not isinstance(data, dict):
@@ -147,10 +173,24 @@ def _validate_required_secrets(names: Tuple[str, ...], environ: Mapping[str, str
 
 
 # ------------------------------------------------------------------ loaders
+def _section(raw: Mapping[str, Any], name: str, factory: Any, keys: Tuple[str, ...]) -> Any:
+    """Optional config section built into a validated settings object (absent -> None)."""
+    if name not in raw:
+        return None
+    section = raw[name]
+    if not isinstance(section, dict):
+        raise ConfigError(f"app.yaml '{name}' must be a mapping")
+    _only_keys(section, keys, f"app.yaml {name}")
+    try:
+        return factory(**section)
+    except TypeError:
+        raise ConfigError(f"app.yaml '{name}' is missing required keys") from None
+
+
 def load_app_config(directory: Optional[Path] = None, environ: Optional[Mapping[str, str]] = None) -> AppConfig:
     source = os.environ if environ is None else environ
     raw = read_yaml((directory or config_dir(source)) / "app.yaml")
-    _only_keys(raw, ("secrets", "rate_limits"), "app.yaml")
+    _only_keys(raw, ("secrets", "rate_limits", "auth", "storage", "audit", "deployment"), "app.yaml")
 
     secrets_raw = raw.get("secrets", {})
     if not isinstance(secrets_raw, dict):
@@ -172,9 +212,15 @@ def load_app_config(directory: Optional[Path] = None, environ: Optional[Mapping[
             raise ConfigError(f"rate limit '{name}' needs 'limit' and 'window_seconds'")
         limits[name] = RateLimit(rule["limit"], rule["window_seconds"])
 
-    config = AppConfig(parse_environment(source), tuple(required), limits)
+    config = AppConfig(parse_environment(source), tuple(required), limits,
+                       _section(raw, "auth", AuthSettings, ("issuer", "audience", "access_token_ttl_seconds",
+                                                            "leeway_seconds", "algorithm")),
+                       _section(raw, "storage", StorageSettings, ("base_dir", "ttl_seconds", "max_bytes", "max_files")),
+                       _section(raw, "audit", AuditSettings, ("base_dir", "filename", "max_bytes")),
+                       _section(raw, "deployment", DeploymentSettings, ("single_process",)))
     if config.is_production:
-        _validate_required_secrets(config.required_secrets, source)
+        needed = tuple(dict.fromkeys(config.required_secrets + (("audit_hmac_key",) if config.audit else ())))
+        _validate_required_secrets(needed, source)
     return config
 
 

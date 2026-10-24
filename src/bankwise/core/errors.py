@@ -13,6 +13,7 @@ from bankwise.core.pii import redact_text
 class ErrorCode(str, Enum):
     CONFIG_INVALID = "config_invalid"
     VALIDATION_FAILED = "validation_failed"
+    AUTHENTICATION_FAILED = "authentication_failed"
     PERMISSION_DENIED = "permission_denied"
     RATE_LIMITED = "rate_limited"
     INTERNAL_ERROR = "internal_error"
@@ -45,6 +46,18 @@ class ConfigError(BankWiseError):
 class InvalidInputError(BankWiseError):
     code = ErrorCode.VALIDATION_FAILED
     public_message = "The request is invalid."
+
+
+class AuthenticationError(BankWiseError):
+    """Authentication failed. The public message never says why (no hints for attackers); the machine-readable
+    `reason` is for audit metadata and internal logs only."""
+
+    code = ErrorCode.AUTHENTICATION_FAILED
+    public_message = "Authentication failed."
+
+    def __init__(self, detail: str = "", reason: str = "invalid_credentials") -> None:
+        super().__init__(detail)
+        self.reason = reason
 
 
 class PermissionDenied(BankWiseError):
