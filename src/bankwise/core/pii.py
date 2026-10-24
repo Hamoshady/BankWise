@@ -26,6 +26,8 @@ _SENSITIVE_EXACT = frozenset({
     "address", "birth_date", "date_of_birth", "dob", "decoded",
     "text", "raw_text", "ocr_text", "text_rows", "text_rows_raw", "lines", "raw_lines",
     "raw_reads", "candidates", "image", "image_bytes", "card_image",
+    # fields of the OCR result schema (id_ocr public JSON)
+    "all_text_lines", "job", "serial", "gender", "religion", "marital_status",
 })
 _SENSITIVE_SUBSTRINGS = (
     "password", "passwd", "secret", "token", "api_key", "apikey", "authorization", "credential",
@@ -34,6 +36,7 @@ _SENSITIVE_SUBSTRINGS = (
 
 _NID_SEPARATED = re.compile(r"(?<!\d)(?:\d[ \-\u00a0]?){13}\d(?!\d)")
 _LONG_DIGITS = re.compile(r"\d{11,}")
+_MASKED_ID = re.compile(r"\d?[*xX\u2022]{6,}\d{0,4}")        # an already-masked id such as 2***********67 still narrows it down
 _JWT = re.compile(r"eyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]*")
 _BEARER = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/=-]{8,}")
 _KEY_SHAPES = re.compile(r"AIza[0-9A-Za-z_-]{30,}|\bsk-[A-Za-z0-9_-]{16,}|\bgh[pousr]_[A-Za-z0-9]{20,}")
@@ -106,6 +109,7 @@ def redact_text(text: str) -> str:
     text = _BEARER.sub(f"Bearer {REDACTED}", text)
     text = _KEY_SHAPES.sub(REDACTED, text)
     text = _NID_SEPARATED.sub(REDACTED_ID, text)
+    text = _MASKED_ID.sub(REDACTED_ID, text)
     return _LONG_DIGITS.sub(REDACTED_ID, text)
 
 

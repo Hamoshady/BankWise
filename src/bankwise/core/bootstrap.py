@@ -34,6 +34,7 @@ class SecurityRuntime:
     service: SecurityService
     audit_sink: AuditSink
     store: Optional[SecureFileStore]
+    authorizer: Authorizer
     warnings: Tuple[str, ...]
 
 
@@ -71,11 +72,12 @@ def build_security(directory: Optional[Path] = None, environ: Optional[Mapping[s
     if not config.is_production:
         warnings.append("development mode: process-local rate limits and token revocation, weak secrets allowed")
 
+    authorizer = Authorizer(load_rbac_policy(directory, source))
     service = SecurityService(
         TokenService(config.auth, get_secret("jwt_secret", source)),
-        Authorizer(load_rbac_policy(directory, source)),
+        authorizer,
         InMemoryRateLimiter(config.rate_limits),
         sink,
     )
     store = SecureFileStore(config.storage, root=base) if config.storage is not None else None
-    return SecurityRuntime(config, service, sink, store, tuple(warnings))
+    return SecurityRuntime(config, service, sink, store, authorizer, tuple(warnings))
