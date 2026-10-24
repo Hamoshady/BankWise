@@ -1,12 +1,15 @@
 # Role-based access control. Anything not granted here is denied.
 # A role grants exact permissions or a whole domain with "domain:*". Every permission a role grants must be
 # listed under `permissions`. Note: `admin` deliberately does NOT include identity:view_sensitive.
+# identity:process (run OCR on an ID-card image pair) is granted ONLY to the dedicated `identity_processor` role;
+# no other role has it, and the role is not a default for anyone.
 
 permissions:
   - identity:submit
   - identity:read
   - identity:view_sensitive
   - identity:review
+  - identity:process
   - audit:read
   - admin:manage
 
@@ -22,3 +25,5 @@ roles:
     - audit:read
   admin:
     - "admin:*"
+  identity_processor:
+    - identity:process

@@ -41,6 +41,8 @@ fields; never pre-format raw OCR text into a message.
 | Rate limiting | `rate_limit.py` | Sliding window, exact boundaries, `peek`, keys normalised (NFKC, casefold, trim) so `Alice`/`ALICE ` share a budget, control characters rejected, thread-safe, fails closed when the key table is full. |
 | Audit trail | `audit.py` | `AuditEvent` refuses personal data. `HashChainedFileAuditSink`: durable (fsync per record), owner-only, never follows symlinks, HMAC-chained, verified at start-up (start fails if tampered), bounded (`write` raises when full), `verify_audit_file`. Tamper-**evident**, not tamper-proof (see below). `LoggingAuditSink` is operational logging only, not an audit record. |
 | Output files | `security.py` | `safe_output_path` rejects absolute/drive/UNC paths, `..`, NUL, control characters, Windows reserved names, NTFS stream and special characters (`: < > " | ? *`), symlink escapes. `write_private_text`: owner-only, no overwrite by default, no symlink at the final component (POSIX), size cap, binary write, half-written file removed on failure. |
+| Image checks | `images.py` | JPEG/PNG only, decided from header bytes (no decoder): size cap, pixel-count cap, minimum side; paths and non-bytes rejected. Does not prove the file is a valid image. |
+| Identity processing | `integration/identity_processing.py` | OCR only after authentication, lockout, rate limit and `identity:process` authorization; validation; concurrency cap; no PII in logs/audit; result wrapped (`summary` redacted, `sensitive` via `reveal_sensitive`); release only after the audit record is written. `integration/id_ocr_adapter.py` connects it to `IdOcrPipeline` (arrays in memory, whitelist summary, redacted `id_ocr` logging, no downloads/debug crops). Unit-tested with a stand-in pipeline that has the real call signature; the real-OCR test is opt-in and has not been run by the author. |
 | Sensitive uploads | `storage.py` | Random opaque ids, owner-only vault (tightened to 0700 or start fails), JPEG/PNG magic bytes, size cap, file-count quota, expiry enforced on read and by `purge_expired()` (also run at start-up), symlinks and hard links never read or overwritten, best-effort overwrite on delete. |
 
 ## Tested (by unit tests, in a sandbox with simulated callers)
@@ -69,7 +71,7 @@ run the commands in the integration guide.
   keeping the old key to verify it. No HMAC PII fingerprint exists (none is needed yet): if one is added it must use its
   own key (`pii_hmac_key`), be versioned, and never be reused as a token or audit key.
 * **Encryption at rest** for stored images and outputs, reliable secure deletion (best effort on SSDs and journaling
-  file systems), image decoding limits (pixel bombs, EXIF), automatic scheduling of `purge_expired()`.
+  file systems), decoding-level image hardening (the header checks in `images.py` stop oversized and non-JPEG/PNG files only; EXIF stripping and decoder safety belong to the OCR side), OCR timeouts, automatic scheduling of `purge_expired()`.
 * **Transport and web hardening** (TLS, CORS, security headers, CSRF, request size limits): API layer, which does not exist.
 * **OCR and identity pipeline integration.** `src/id_ocr/` and the identity scripts are unchanged; no claim is made about
   their own logging, `--out` files, `--debug` image directories or `output_cards/`.

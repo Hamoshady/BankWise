@@ -102,3 +102,10 @@ def test_sensitive_wrapper_never_shows_its_value():
     assert copy.deepcopy(secret).reveal() == FAKE_NID
     with pytest.raises(TypeError):
         pickle.dumps(secret)
+
+
+@pytest.mark.parametrize("key", ["all_text_lines", "job", "serial", "gender", "religion", "marital_status", "other_names",
+                                 "address_line1", "address_line2"])
+def test_every_personal_field_of_the_ocr_result_schema_is_a_sensitive_key(key):
+    assert is_sensitive_key(key)
+    assert redact({key: "value", "decision": "MANUAL_REVIEW"}) == {key: REDACTED, "decision": "MANUAL_REVIEW"}

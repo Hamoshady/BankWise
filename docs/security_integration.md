@@ -15,6 +15,7 @@ into an execution path yet; "ready" means a tested library exists, not that anyt
 | Token authentication | ready | no | there is a login handler and an API |
 | Password hashing | ready | no | there is a user store |
 | Rate limiting | ready (in-memory only) | no | an API exists; use a shared backend if multi-process |
+| Identity processing service (`integration/identity_processing.py`) | ready, tested with a **simulated** OCR processor | no: needs an adapter for `IdOcrPipeline` and an entry point | the OCR adapter and the API/worker exist |
 | Sensitive uploads | ready | no | the API receives images |
 | Safe output files | ready | **no: the OCR CLI `--out` still writes directly** | the CLI is updated (snippet below) |
 
@@ -37,6 +38,79 @@ for note in runtime.warnings:                    # development notes; empty in a
 ```
 
 `tests/unit/core/test_bootstrap.py` runs this against real and temporary configs, in development and production.
+
+## Identity processing (OCR behind the security layer)
+
+`IdentityProcessingService.process(authorization_header, client_key, front_bytes, back_bytes, request_id=None)` is the only
+intended way to run OCR for a caller. OCR runs only after, in this order: authentication -> per-client lockout ->
+per-user rate limit (`identity_process`) -> authorization (`identity:process`) -> header-level image validation
+(JPEG/PNG only, `max_image_bytes`, `max_pixels`, `min_side_pixels`) -> a concurrency slot (`max_concurrent`). A failure
+at any step stops there and the processor is not called. Rejected requests still spend the user's rate-limit budget.
+
+```python
+from bankwise.integration.identity_processing import create_identity_service
+
+service = create_identity_service(my_ocr_adapter)    # build_security() inside: ConfigError means do not start
+result = service.process(request.headers.get("Authorization"), f"ip:{client_ip}", front_bytes, back_bytes,
+                         request_id=request_id)
+result.summary    # redacted copy, safe to return to the caller or to log
+result.sensitive  # raw OCR mapping in a Sensitive wrapper: only security.reveal_sensitive(...) can read it
+result.notice     # always: OCR extraction only, not proof of authenticity or of the holder's identity
+```
+
+* **RBAC:** `identity:process` is granted only to the dedicated `identity_processor` role (see `configs/rbac.yaml`). No
+  existing role (`operator`, `reviewer`, `auditor`, `admin`) has it, and nobody gets it by default.
+* **Privacy:** logs and audit events carry only the request id, outcome, error code, image kind, byte counts and timing.
+  A successful result is released only after its audit record has been written (fail-closed). OCR failures become a generic
+  `internal_error`; the exception message is never copied anywhere.
+* **Adapter** (`integration/id_ocr_adapter.py`, written against the real `IdOcrPipeline.process()`): the pipeline accepts a
+  numpy array per side, so the adapter decodes the validated bytes in memory (`cv2.imdecode`, BGR) and passes arrays. **No
+  temporary file is written and no path is passed.** The pipeline's `public` JSON (national id, names, address,
+  `all_text_lines`, ...) becomes `result.sensitive` (readable only through `reveal_sensitive`); `result.summary` is a
+  codes-only WHITELIST projection (decision codes, check states, `name:status` pairs, quality numbers, timings), so a field
+  added to the pipeline later cannot leak into it. `create_id_ocr_adapter()` builds the pipeline with `download_models=False`
+  (install models beforehand) and `debug_dir=None` (no crops on disk), and `protect_ocr_logging()` puts the redacting handler
+  on the `id_ocr` logger at WARNING or above: the pipeline's own INFO line contains a partially masked id.
+* The CLI (`id_ocr/cli.py`) and the pipeline are unchanged. The CLI's `--out` file and `--debug-dir` crops are still written
+  directly and are not covered by any of this.
+
+```python
+from bankwise.integration.id_ocr_adapter import create_id_ocr_adapter
+from bankwise.integration.identity_processing import create_identity_service
+
+adapter = create_id_ocr_adapter(model_dir="models", use_gpu=True)     # EngineError here = deployment problem
+service = create_identity_service(adapter)                            # ConfigError here = do not start
+result = service.process(authorization_header, "ip:203.0.113.7", front_bytes, back_bytes)
+```
+
+* **Not provided:** an OCR timeout (a hung run keeps its slot), decoding-level image hardening (only headers are checked),
+  persistence of results, and any claim that a card is genuine or that its holder is the person presenting it.
+
+### The user-verification interface to add later (not implemented, no default users exist)
+
+```python
+class CredentialVerifier(Protocol):
+    def verify(self, username: str, password: str) -> Optional[Principal]:   # None = unknown user OR wrong password
+        ...
+```
+
+A login handler built on it must: verify with `verify_password_or_dummy(stored_hash_or_None, password)`; rate-limit
+with the `auth_attempt` policy per client **and** per (normalised) username; load the roles from the user store at login time
+(so a role change plus `revoke_subject` takes effect); return the token from `security.issue_token(principal)`; never
+log the password or the token. Its user table, password reset and account management are separate work.
+
+### Running the real-OCR integration test (opt-in, on your machine)
+
+```powershell
+$env:RUN_REAL_OCR = "1"
+$env:ID_OCR_MODEL_DIR = "C:\path\to\models"     # optional; models must already be downloaded
+$env:ID_OCR_GPU = "1"                                # optional; default CPU
+python -m pytest tests/integration -q -s -rs
+```
+
+It uses a synthetic card (no real data) and checks the integration contract: gates, in-memory decoding, no PII in logs/audit/
+summary, no files written, and that bytes and a file path give the same OCR result. It is skipped, with the reason printed,
+unless `RUN_REAL_OCR=1` and easyocr/id_ocr are importable.
 
 ## Integration points by phase
 

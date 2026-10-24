@@ -55,6 +55,27 @@ class DeploymentSettings:
             raise ConfigError("deployment single_process must be true or false")
 
 
+@dataclass(frozen=True)
+class IdentityProcessingSettings:
+    """Limits for processing an ID-card image pair (see bankwise.integration.identity_processing)."""
+
+    max_image_bytes: int = 5 * 1024 * 1024
+    max_pixels: int = 25_000_000
+    min_side_pixels: int = 100
+    rate_policy: str = "identity_process"
+    max_concurrent: int = 1
+
+    def __post_init__(self) -> None:
+        for label, value, low, high in (("max_image_bytes", self.max_image_bytes, 1024, 20 * 1024 * 1024),
+                                        ("max_pixels", self.max_pixels, 10_000, 100_000_000),
+                                        ("min_side_pixels", self.min_side_pixels, 16, 2000),
+                                        ("max_concurrent", self.max_concurrent, 1, 8)):
+            if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
+                raise ConfigError(f"identity_processing {label} must be an integer between {low} and {high}")
+        if not isinstance(self.rate_policy, str) or not _POLICY_NAME_RE.match(self.rate_policy):
+            raise ConfigError("identity_processing rate_policy must be a lowercase policy name")
+
+
 class Environment(str, Enum):
     DEVELOPMENT = "development"
     PRODUCTION = "production"
@@ -69,6 +90,7 @@ class AppConfig:
     storage: Optional[StorageSettings] = None
     audit: Optional[AuditSettings] = None
     deployment: Optional[DeploymentSettings] = None
+    identity_processing: Optional[IdentityProcessingSettings] = None
 
     @property
     def is_production(self) -> bool:
@@ -190,7 +212,7 @@ def _section(raw: Mapping[str, Any], name: str, factory: Any, keys: Tuple[str, .
 def load_app_config(directory: Optional[Path] = None, environ: Optional[Mapping[str, str]] = None) -> AppConfig:
     source = os.environ if environ is None else environ
     raw = read_yaml((directory or config_dir(source)) / "app.yaml")
-    _only_keys(raw, ("secrets", "rate_limits", "auth", "storage", "audit", "deployment"), "app.yaml")
+    _only_keys(raw, ("secrets", "rate_limits", "auth", "storage", "audit", "deployment", "identity_processing"), "app.yaml")
 
     secrets_raw = raw.get("secrets", {})
     if not isinstance(secrets_raw, dict):
@@ -217,7 +239,9 @@ def load_app_config(directory: Optional[Path] = None, environ: Optional[Mapping[
                                                             "leeway_seconds", "algorithm")),
                        _section(raw, "storage", StorageSettings, ("base_dir", "ttl_seconds", "max_bytes", "max_files")),
                        _section(raw, "audit", AuditSettings, ("base_dir", "filename", "max_bytes")),
-                       _section(raw, "deployment", DeploymentSettings, ("single_process",)))
+                       _section(raw, "deployment", DeploymentSettings, ("single_process",)),
+                       _section(raw, "identity_processing", IdentityProcessingSettings,
+                                ("max_image_bytes", "max_pixels", "min_side_pixels", "rate_policy", "max_concurrent")))
     if config.is_production:
         needed = tuple(dict.fromkeys(config.required_secrets + (("audit_hmac_key",) if config.audit else ())))
         _validate_required_secrets(needed, source)

@@ -35,6 +35,9 @@ rate_limits:
   expensive:
     limit: 2
     window_seconds: 60
+  identity_process:                # OCR is expensive: per-user budget
+    limit: 5
+    window_seconds: 60
 
 # Durable, tamper-evident audit file (core/audit.py HashChainedFileAuditSink). Needs BANKWISE_AUDIT_HMAC_KEY.
 # Production start-up (core/bootstrap.py) refuses to run without this section. Single process only.
@@ -47,3 +50,13 @@ audit:
 # live in that process's memory; set to true only if that is really the deployment. Leave false/absent otherwise.
 deployment:
   single_process: false
+
+# Limits for processing an ID-card image pair (integration/identity_processing.py). Images larger than
+# max_image_bytes, larger than max_pixels, smaller than min_side_pixels, or not JPEG/PNG are refused before OCR.
+# max_concurrent caps simultaneous OCR runs (GPU/CPU memory); extra requests get a rate-limit error.
+identity_processing:
+  max_image_bytes: 5242880         # 5 MiB per image
+  max_pixels: 25000000             # 25 megapixels
+  min_side_pixels: 100
+  rate_policy: identity_process
+  max_concurrent: 1

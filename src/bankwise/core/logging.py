@@ -151,11 +151,12 @@ class ConsoleFormatter(logging.Formatter):
 
 
 # ------------------------------------------------------------------ setup
-def configure_logging(settings: Optional[LoggingSettings] = None, stream: Optional[IO[str]] = None) -> logging.Logger:
-    """Install ONE managed handler on the `bankwise` logger (not the root logger). Safe to call repeatedly:
-    the previous managed handler is replaced, never duplicated."""
+def configure_logging(settings: Optional[LoggingSettings] = None, stream: Optional[IO[str]] = None,
+                      logger_name: str = LOGGER_NAME) -> logging.Logger:
+    """Install ONE managed handler on the `bankwise` logger (or on another named logger such as `id_ocr`), never on
+    the root logger. Safe to call repeatedly: the previous managed handler is replaced, never duplicated."""
     settings = settings or LoggingSettings()
-    logger = logging.getLogger(LOGGER_NAME)
+    logger = logging.getLogger(logger_name)
     for handler in list(logger.handlers):
         if getattr(handler, "_bankwise_managed", False):
             logger.removeHandler(handler)
