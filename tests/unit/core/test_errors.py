@@ -3,20 +3,22 @@ import json
 import pytest
 
 from bankwise.core.errors import (
-    BankWiseError, ConfigError, ErrorCode, InvalidInputError, PermissionDenied, RateLimitExceeded, to_public_error,
+    AuthenticationError, BankWiseError, ConfigError, ErrorCode, InvalidInputError, PermissionDenied, RateLimitExceeded,
+    to_public_error,
 )
 from core_test_data import FAKE_NID
 
-ALL = [BankWiseError, ConfigError, InvalidInputError, PermissionDenied, RateLimitExceeded]
+ALL = [BankWiseError, ConfigError, InvalidInputError, AuthenticationError, PermissionDenied, RateLimitExceeded]
 
 
 def test_error_codes_are_stable_strings():
     assert {code.name: code.value for code in ErrorCode} == {
         "CONFIG_INVALID": "config_invalid", "VALIDATION_FAILED": "validation_failed",
-        "PERMISSION_DENIED": "permission_denied", "RATE_LIMITED": "rate_limited", "INTERNAL_ERROR": "internal_error",
+        "AUTHENTICATION_FAILED": "authentication_failed", "PERMISSION_DENIED": "permission_denied", "RATE_LIMITED": "rate_limited", "INTERNAL_ERROR": "internal_error",
     }
     assert ConfigError.code is ErrorCode.CONFIG_INVALID
     assert InvalidInputError.code is ErrorCode.VALIDATION_FAILED
+    assert AuthenticationError.code is ErrorCode.AUTHENTICATION_FAILED
     assert PermissionDenied.code is ErrorCode.PERMISSION_DENIED
     assert RateLimitExceeded.code is ErrorCode.RATE_LIMITED
     assert BankWiseError.code is ErrorCode.INTERNAL_ERROR
@@ -49,3 +51,10 @@ def test_rate_limit_error_exposes_only_a_retry_hint():
     public = RateLimitExceeded("limit 'identity_submit' hit", retry_after_seconds=12.2).to_public()
     assert public == {"code": "rate_limited", "message": RateLimitExceeded.public_message, "retry_after_seconds": 13}
     assert "retry_after_seconds" not in RateLimitExceeded("x").to_public()
+
+
+def test_authentication_errors_keep_the_reason_internal():
+    error = AuthenticationError("token rejected: expired", "expired")
+    assert error.reason == "expired"
+    assert error.to_public() == {"code": "authentication_failed", "message": "Authentication failed."}
+    assert "expired" not in str(error) and "expired" not in repr(error.to_public())

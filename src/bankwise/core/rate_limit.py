@@ -12,13 +12,25 @@ from __future__ import annotations
 
 import threading
 import time
+import unicodedata
 from collections import deque
 from dataclasses import dataclass
-from typing import Callable, Deque, Dict, Mapping, Tuple
+from typing import Callable, Deque, Dict, Mapping, Protocol, Tuple
 
 from bankwise.core.errors import ConfigError, InvalidInputError, RateLimitExceeded
 
 MAX_KEY_CHARS = 128
+
+
+def normalise_key(key: str) -> str:
+    """Canonical form of a caller-supplied key, so trivial variants ('Alice', 'ALICE ', full-width letters)
+    cannot get separate budgets. Raises InvalidInputError for empty, oversized or control-character keys."""
+    if not isinstance(key, str):
+        raise InvalidInputError("rate limit key must be a string")
+    canonical = unicodedata.normalize("NFKC", key).strip().casefold()
+    if not canonical or len(canonical) > MAX_KEY_CHARS or not canonical.isprintable():
+        raise InvalidInputError("rate limit key must be a non-empty printable string of at most 128 characters")
+    return canonical
 
 
 @dataclass(frozen=True)
@@ -41,6 +53,20 @@ class RateDecision:
     retry_after_seconds: float
 
 
+class RateLimiterBackend(Protocol):
+    """What callers (see guard.py) need from a limiter. `InMemoryRateLimiter` is the only implementation;
+    a shared-store implementation can replace it without touching callers."""
+
+    def acquire(self, policy: str, key: str) -> RateDecision:
+        ...
+
+    def peek(self, policy: str, key: str) -> RateDecision:
+        ...
+
+    def enforce(self, policy: str, key: str) -> RateDecision:
+        ...
+
+
 class InMemoryRateLimiter:
     def __init__(self, policies: Mapping[str, RateLimit], clock: Callable[[], float] = time.monotonic,
                  max_keys: int = 10000) -> None:
@@ -53,11 +79,8 @@ class InMemoryRateLimiter:
     def acquire(self, policy: str, key: str) -> RateDecision:
         """Record one hit for `key` under `policy` if allowed. The key must be an explicit non-empty string:
         there is no shared 'anonymous' bucket, so callers choose one on purpose (for example 'anon:<client>')."""
-        rule = self._policies.get(policy)
-        if rule is None:
-            raise ConfigError(f"unknown rate limit policy '{policy}'")
-        if not isinstance(key, str) or not key.strip() or len(key) > MAX_KEY_CHARS:
-            raise InvalidInputError("rate limit key must be a non-empty string of at most 128 characters")
+        rule = self._rule_for(policy, key)
+        key = normalise_key(key)
         now = self._clock()
         with self._lock:
             slot = (policy, key)
@@ -74,6 +97,29 @@ class InMemoryRateLimiter:
                 return RateDecision(False, 0, max(hits[0] + rule.window_seconds - now, 0.0))
             hits.append(now)
             return RateDecision(True, rule.limit - len(hits), 0.0)
+
+    def peek(self, policy: str, key: str) -> RateDecision:
+        """Report what `acquire` would decide, WITHOUT recording a hit. Used to refuse callers who already
+        exhausted a budget that is only charged on failures (see guard.py)."""
+        rule = self._rule_for(policy, key)
+        key = normalise_key(key)
+        now = self._clock()
+        with self._lock:
+            hits = self._hits.get((policy, key))
+            if hits is not None:
+                while hits and hits[0] <= now - rule.window_seconds:
+                    hits.popleft()
+            used = len(hits) if hits else 0
+            if used >= rule.limit:
+                return RateDecision(False, 0, max(hits[0] + rule.window_seconds - now, 0.0))
+            return RateDecision(True, rule.limit - used, 0.0)
+
+    def _rule_for(self, policy: str, key: str) -> RateLimit:
+        rule = self._policies.get(policy)
+        if rule is None:
+            raise ConfigError(f"unknown rate limit policy '{policy}'")
+        normalise_key(key)                                  # validates; callers re-normalise for the table slot
+        return rule
 
     def enforce(self, policy: str, key: str) -> RateDecision:
         decision = self.acquire(policy, key)
