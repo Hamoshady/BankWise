@@ -1,0 +1,4 @@
+# Optional CPU recognition backend. Install separately; EasyOCR remains the default.
+# No PaddleOCR [all]/VL extras, YOLO or GPU runtime.
+paddlepaddle==3.2.2
+paddleocr==3.3.2

@@ -1,0 +1,619 @@
+{
+  "backend": "paddle",
+  "model": {
+    "backend": "paddle",
+    "model": "arabic_PP-OCRv5_mobile_rec",
+    "readers": {
+      "ar": "cpu"
+    },
+    "ocr_calls": 218,
+    "inference_ms_total": 17585.6,
+    "field_detection": "template",
+    "yolo": "disabled"
+  },
+  "cpu_threads": 4,
+  "yolo_enabled": false,
+  "opencv_version": "4.10.0",
+  "numpy_version": "2.4.6",
+  "sample_count": 3,
+  "normalization": "Unicode NFKC, whitespace/bidi cleanup, Western digits; NO Arabic letter substitution",
+  "initialization_seconds": 4.737654569000142,
+  "pipeline_warmup_seconds": 1.4090531770000325,
+  "warm_mean_seconds": 1.5296166996666518,
+  "warm_p95_seconds": 1.6749071445999562,
+  "warm_measurements": 9,
+  "peak_process_rss_mb": 699.0,
+  "field_metrics": {
+    "first_name": {
+      "count": 3,
+      "exact_match": 1.0,
+      "cer": 0.0
+    },
+    "other_names": {
+      "count": 3,
+      "exact_match": 1.0,
+      "cer": 0.0
+    },
+    "address_line1": {
+      "count": 3,
+      "exact_match": 0.0,
+      "cer": 0.0759493670886076
+    },
+    "address_line2": {
+      "count": 3,
+      "exact_match": 0.0,
+      "cer": 0.09090909090909091
+    },
+    "national_id": {
+      "count": 3,
+      "exact_match": 0.3333333333333333,
+      "cer": 0.6666666666666666
+    },
+    "birth_date": {
+      "count": 3,
+      "exact_match": 0.3333333333333333,
+      "cer": 1.0
+    },
+    "serial": {
+      "count": 3,
+      "exact_match": 0.6666666666666666,
+      "cer": 0.038461538461538464
+    },
+    "job": {
+      "count": 3,
+      "exact_match": 0.3333333333333333,
+      "cer": 0.6666666666666666
+    },
+    "gender": {
+      "count": 3,
+      "exact_match": 0.0,
+      "cer": 1.0
+    },
+    "religion": {
+      "count": 3,
+      "exact_match": 0.0,
+      "cer": 1.0
+    },
+    "marital_status": {
+      "count": 3,
+      "exact_match": 1.0,
+      "cer": 0.0
+    },
+    "issue_date": {
+      "count": 3,
+      "exact_match": 1.0,
+      "cer": 0.0
+    },
+    "expiry_date": {
+      "count": 3,
+      "exact_match": 1.0,
+      "cer": 0.0
+    }
+  },
+  "overall_fields": {
+    "count": 39,
+    "exact_match": 0.5128205128205128,
+    "cer": 0.22062350119904076
+  },
+  "complete_card_accuracy": 0.0,
+  "manual_review_rate": 1.0,
+  "cards": [
+    {
+      "sample": "A",
+      "matched": [
+        "first_name",
+        "other_names",
+        "serial",
+        "job",
+        "marital_status",
+        "issue_date",
+        "expiry_date"
+      ],
+      "missing": [
+        "national_id",
+        "birth_date",
+        "gender",
+        "religion"
+      ],
+      "incorrect": [
+        "address_line1",
+        "address_line2"
+      ],
+      "uncertain": [
+        "national_id",
+        "birth_date",
+        "serial",
+        "gender",
+        "religion",
+        "marital_status"
+      ],
+      "manual_review": true,
+      "field_diagnostics": {
+        "front": {
+          "national_id": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9495545625686646,
+            "attempts": 1
+          },
+          "birth_date": {
+            "status": "invalid",
+            "flags": [
+              "date_unsupported_length"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "first_name": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9762009978294373,
+            "attempts": 1
+          },
+          "other_names": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9773878455162048,
+            "attempts": 1
+          },
+          "address_line1": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.934016227722168,
+            "attempts": 1
+          },
+          "address_line2": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9312515258789062,
+            "attempts": 1
+          },
+          "serial": {
+            "status": "low_confidence",
+            "flags": [
+              "single_pass_format_check",
+              "serial_format_unverified"
+            ],
+            "confidence": 0.9568347930908203,
+            "attempts": 1
+          }
+        },
+        "back": {
+          "national_id": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9378084540367126,
+            "attempts": 1
+          },
+          "issue_date": {
+            "status": "ok",
+            "flags": [
+              "separator_inferred",
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8842878937721252,
+            "attempts": 1
+          },
+          "expiry_date": {
+            "status": "ok",
+            "flags": [
+              "date_unsupported_length",
+              "separator_inferred",
+              "some_attempts_unreadable",
+              "selective_retry"
+            ],
+            "confidence": 0.8504101634025574,
+            "attempts": 2
+          },
+          "job": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8475809693336487,
+            "attempts": 1
+          },
+          "gender": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "religion": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "marital_status": {
+            "status": "low_confidence",
+            "flags": [],
+            "confidence": 0.7865325212478638,
+            "attempts": 1
+          }
+        }
+      },
+      "complete_correct": false
+    },
+    {
+      "sample": "B",
+      "matched": [
+        "first_name",
+        "other_names",
+        "serial",
+        "marital_status",
+        "issue_date",
+        "expiry_date"
+      ],
+      "missing": [
+        "national_id",
+        "birth_date",
+        "job",
+        "gender",
+        "religion"
+      ],
+      "incorrect": [
+        "address_line1",
+        "address_line2"
+      ],
+      "uncertain": [
+        "national_id",
+        "birth_date",
+        "serial",
+        "job",
+        "gender",
+        "religion"
+      ],
+      "manual_review": true,
+      "field_diagnostics": {
+        "front": {
+          "national_id": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9328514337539673,
+            "attempts": 1
+          },
+          "birth_date": {
+            "status": "invalid",
+            "flags": [
+              "date_unsupported_length"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "first_name": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8440782427787781,
+            "attempts": 1
+          },
+          "other_names": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9410513639450073,
+            "attempts": 1
+          },
+          "address_line1": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8921182751655579,
+            "attempts": 1
+          },
+          "address_line2": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8959659934043884,
+            "attempts": 1
+          },
+          "serial": {
+            "status": "low_confidence",
+            "flags": [
+              "single_pass_format_check",
+              "serial_format_unverified"
+            ],
+            "confidence": 0.8889040350914001,
+            "attempts": 1
+          }
+        },
+        "back": {
+          "national_id": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8538225889205933,
+            "attempts": 1
+          },
+          "issue_date": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9071776866912842,
+            "attempts": 1
+          },
+          "expiry_date": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8581515550613403,
+            "attempts": 1
+          },
+          "job": {
+            "status": "conflict",
+            "flags": [
+              "candidate_conflict"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "gender": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "religion": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "marital_status": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.816617488861084,
+            "attempts": 1
+          }
+        }
+      },
+      "complete_correct": false
+    },
+    {
+      "sample": "C",
+      "matched": [
+        "first_name",
+        "other_names",
+        "national_id",
+        "birth_date",
+        "marital_status",
+        "issue_date",
+        "expiry_date"
+      ],
+      "missing": [
+        "job",
+        "gender",
+        "religion"
+      ],
+      "incorrect": [
+        "address_line1",
+        "address_line2",
+        "serial"
+      ],
+      "uncertain": [
+        "national_id",
+        "birth_date",
+        "serial",
+        "job",
+        "gender",
+        "religion"
+      ],
+      "manual_review": true,
+      "field_diagnostics": {
+        "front": {
+          "national_id": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8745959401130676,
+            "attempts": 1
+          },
+          "birth_date": {
+            "status": "invalid",
+            "flags": [
+              "date_unsupported_length"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "first_name": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9618753790855408,
+            "attempts": 1
+          },
+          "other_names": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9728190898895264,
+            "attempts": 1
+          },
+          "address_line1": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.9433034062385559,
+            "attempts": 1
+          },
+          "address_line2": {
+            "status": "ok",
+            "flags": [
+              "single_pass_format_check"
+            ],
+            "confidence": 0.937754213809967,
+            "attempts": 1
+          },
+          "serial": {
+            "status": "low_confidence",
+            "flags": [
+              "single_pass_format_check",
+              "serial_format_unverified"
+            ],
+            "confidence": 0.9925760626792908,
+            "attempts": 1
+          }
+        },
+        "back": {
+          "national_id": {
+            "status": "conflict",
+            "flags": [
+              "national_id_length_13",
+              "candidate_conflict"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "issue_date": {
+            "status": "ok",
+            "flags": [
+              "separator_inferred",
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8573282957077026,
+            "attempts": 1
+          },
+          "expiry_date": {
+            "status": "ok",
+            "flags": [
+              "separator_inferred",
+              "single_pass_format_check"
+            ],
+            "confidence": 0.8885733485221863,
+            "attempts": 1
+          },
+          "job": {
+            "status": "conflict",
+            "flags": [
+              "candidate_conflict"
+            ],
+            "confidence": null,
+            "attempts": 3
+          },
+          "gender": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "religion": {
+            "status": "unreadable",
+            "flags": [],
+            "confidence": null,
+            "attempts": 0
+          },
+          "marital_status": {
+            "status": "ok",
+            "flags": [],
+            "confidence": 0.8542805314064026,
+            "attempts": 3
+          }
+        }
+      },
+      "complete_correct": false
+    }
+  ],
+  "same_crop_comparison": {
+    "pixel_digest": "d2225bc2b86f83d1b7ca17dbbb3aeb54120e8d8d9d9055d0d55861bc0a2b5c99",
+    "metrics": {
+      "count": 36,
+      "exact_match": 0.4444444444444444,
+      "cer": 0.0967741935483871
+    },
+    "fields": {
+      "front.national_id": {
+        "count": 3,
+        "exact_match": 1.0,
+        "cer": 0.0
+      },
+      "front.birth_date": {
+        "count": 3,
+        "exact_match": 0.3333333333333333,
+        "cer": 0.25
+      },
+      "front.first_name": {
+        "count": 3,
+        "exact_match": 1.0,
+        "cer": 0.0
+      },
+      "front.other_names": {
+        "count": 3,
+        "exact_match": 1.0,
+        "cer": 0.0
+      },
+      "front.address_line1": {
+        "count": 3,
+        "exact_match": 0.0,
+        "cer": 0.0759493670886076
+      },
+      "front.address_line2": {
+        "count": 3,
+        "exact_match": 0.0,
+        "cer": 0.09090909090909091
+      },
+      "front.serial": {
+        "count": 3,
+        "exact_match": 0.6666666666666666,
+        "cer": 0.038461538461538464
+      },
+      "back.national_id": {
+        "count": 3,
+        "exact_match": 0.3333333333333333,
+        "cer": 0.09523809523809523
+      },
+      "back.issue_date": {
+        "count": 3,
+        "exact_match": 0.0,
+        "cer": 0.14285714285714285
+      },
+      "back.expiry_date": {
+        "count": 3,
+        "exact_match": 0.0,
+        "cer": 0.23333333333333334
+      },
+      "back.job": {
+        "count": 3,
+        "exact_match": 1.0,
+        "cer": 0.0
+      },
+      "back.attributes": {
+        "count": 3,
+        "exact_match": 0.0,
+        "cer": 0.28205128205128205
+      }
+    },
+    "total_seconds": 3.0385141220001515,
+    "crop_count": 36
+  },
+  "note": "Small paired-image benchmark, not population accuracy. RSS includes Python/libraries; no remote OCR."
+}

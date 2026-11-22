@@ -1,0 +1,27 @@
+........................................................................ [  9%]
+.....ssssssssssssssssssssssssssss....................................... [ 18%]
+..ss.................................................................... [ 27%]
+........................................................................ [ 36%]
+........................................................................ [ 45%]
+........................................................................ [ 54%]
+........................................................................ [ 63%]
+........................................................................ [ 72%]
+........................................................................ [ 81%]
+........................................................................ [ 90%]
+........................................................................ [ 99%]
+....                                                                     [100%]
+=============================== warnings summary ===============================
+../usr/local/lib/python3.11/site-packages/fastapi/testclient.py:1
+  /usr/local/lib/python3.11/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [21] tests/integration/test_rag_policy_acceptance.py:30: requires local pretrained E5/Qwen models
+SKIPPED [1] tests/integration/test_real_ocr_pipeline.py:80: opt-in: set RUN_REAL_OCR=1 (needs easyocr, torch and the downloaded OCR models; slow)
+SKIPPED [1] tests/integration/test_real_ocr_pipeline.py:104: opt-in: set RUN_REAL_OCR=1 (needs easyocr, torch and the downloaded OCR models; slow)
+SKIPPED [1] tests/integration/test_real_ocr_pipeline.py:118: opt-in: set RUN_REAL_OCR=1 (needs easyocr, torch and the downloaded OCR models; slow)
+SKIPPED [4] tests/integration/test_semantic_models.py:16: opt-in local pretrained RAG model test: BANKWISE_TEST_SEMANTIC=1
+SKIPPED [1] tests/test_ocr.py:494: set BANKWISE_RUN_OCR=1 with EasyOCR installed to run the real-model smoke test
+SKIPPED [1] tests/test_ocr.py:506: set BANKWISE_RUN_OCR=1 with EasyOCR installed to run the real-model smoke test
+766 passed, 30 skipped, 1 warning in 26.33s

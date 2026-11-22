@@ -1,0 +1,52 @@
+{
+  "bank": "CIB Egypt",
+  "reviewed_at": "2026-11-15",
+  "scope": "Reviewed Arabic summaries of public official sources; not complete contracts. Original binary downloads blocked by site protection.",
+  "documents": {
+    "loans": {
+      "title": "القرض الشخصي من CIB",
+      "url": "https://www.cibeg.com/en/personal/loans-and-overdrafts/personal",
+      "locator": "Requirements / Fees and charges",
+      "effective_date": null,
+      "reviewed_at": "2026-11-15",
+      "representation": "reviewed_arabic_summary",
+      "sha256": "35f4c0601122c2d24bcb695cd5ed6f42d95fe48225cb563c10ed309a20984025"
+    },
+    "account_opening": {
+      "title": "حساب Classic الجاري",
+      "url": "https://www.cibeg.com/en/personal/accounts-and-deposits/current-accounts/classic",
+      "locator": "Features / Benefits",
+      "effective_date": null,
+      "reviewed_at": "2026-11-15",
+      "representation": "reviewed_arabic_summary",
+      "sha256": "d1ab2908ccb4acf0d32563bbbdb799301f5daedd7a3faa91e3d2aa9c4a825077"
+    },
+    "account_closure": {
+      "title": "شروط الحساب والخدمات الإلكترونية",
+      "url": "https://www.cibeg.com/-/media/project/downloads/terms-and-conditions/personal-banking/accounts/terms-and-conditions-arabic.pdf",
+      "locator": "صفحة 1: البنود 3 و13 و17؛ صفحة 2: البنود 1 و2 و4",
+      "effective_date": null,
+      "reviewed_at": "2026-11-15",
+      "representation": "reviewed_arabic_summary",
+      "sha256": "2028fbbf90630e327161b45d0532fd9827f3c2e7eb04d81d61707565ba76bc2f"
+    },
+    "bedaya": {
+      "title": "حساب بداية للتوفير",
+      "url": "https://www.cibeg.com/en/personal/accounts-and-deposits/saving-accounts/bedaya",
+      "locator": "Account Details / Debit and Balance Limits",
+      "effective_date": null,
+      "reviewed_at": "2026-11-15",
+      "representation": "reviewed_arabic_summary",
+      "sha256": "c68bfea132a9bb163093747a897ddafe01518873fa186d1845ff5dede2b09e0f"
+    },
+    "account_fees": {
+      "title": "رسوم الحسابات CIB",
+      "url": "https://www.cibeg.com/-/media/project/downloads/fees-and-charges/new-personal-fees-and-charges/cib-account-en.pdf",
+      "locator": "صفحة 1 — Accounts-En-V21",
+      "effective_date": "2026-09-01",
+      "reviewed_at": "2026-11-15",
+      "representation": "reviewed_arabic_summary",
+      "sha256": "4a1693c56780c2ebe87fcf21ec5c9a2e725f583456636ac5ad6c66e65394f8d6"
+    }
+  }
+}

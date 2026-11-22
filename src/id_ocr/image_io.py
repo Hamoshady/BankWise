@@ -76,6 +76,8 @@ def validate_array(img: np.ndarray, cfg: Optional[OcrConfig] = None) -> np.ndarr
 
 def crop_normalized(img: np.ndarray, box: Box) -> np.ndarray:
     """Crop with a normalised (x0, y0, x1, y1) box. Returns a view (no copy)."""
+    if len(box) != 4 or not all(np.isfinite(v) for v in box):
+        raise ImageError('invalid_crop', 'Crop coordinates must be finite.')
     h, w = img.shape[:2]
     x0, y0, x1, y1 = box
     xa, xb = max(int(x0 * w), 0), min(int(round(x1 * w)), w)

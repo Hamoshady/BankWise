@@ -1,0 +1,1982 @@
+{
+  "labels_verified": false,
+  "accuracy_basis": "PROVISIONAL_UNVERIFIED_LABELS",
+  "device": {
+    "ar": "cuda",
+    "en": "cuda"
+  },
+  "per_side": {
+    "front": {
+      "images": 6,
+      "decision_rates": {
+        "VERIFIED": 0.167,
+        "RETRY": 0.333,
+        "MANUAL_REVIEW": 0.5,
+        "REJECTED": 0.0
+      },
+      "time_ms": {
+        "mean": 506.9,
+        "median": 475.8,
+        "max": 767.4
+      },
+      "fields": {
+        "national_id": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0
+        },
+        "serial": {
+          "n": 6,
+          "exact_match": 0.833,
+          "extraction_rate": 0.833,
+          "false_accepts": 0
+        },
+        "birth_date": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0
+        },
+        "first_name": {
+          "n": 6,
+          "exact_match": 0.833,
+          "extraction_rate": 0.833,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.1667,
+          "wer_nulls_as_100pct": 0.1667
+        },
+        "other_names": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.0,
+          "wer_nulls_as_100pct": 0.0
+        },
+        "address_line1": {
+          "n": 6,
+          "exact_match": 0.833,
+          "extraction_rate": 1.0,
+          "false_accepts": 1,
+          "cer_nulls_as_100pct": 0.0051,
+          "wer_nulls_as_100pct": 0.0278
+        },
+        "address_line2": {
+          "n": 6,
+          "exact_match": 0.333,
+          "extraction_rate": 0.333,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.6667,
+          "wer_nulls_as_100pct": 0.6667
+        }
+      },
+      "false_accepts_inside_VERIFIED_results": 0
+    },
+    "back": {
+      "images": 6,
+      "decision_rates": {
+        "VERIFIED": 1.0,
+        "RETRY": 0.0,
+        "MANUAL_REVIEW": 0.0,
+        "REJECTED": 0.0
+      },
+      "time_ms": {
+        "mean": 303.7,
+        "median": 303.6,
+        "max": 332.0
+      },
+      "fields": {
+        "national_id": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0
+        },
+        "issue_date": {
+          "n": 6,
+          "exact_match": 0.833,
+          "extraction_rate": 0.833,
+          "false_accepts": 0
+        },
+        "expiry_date": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0
+        },
+        "job": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.0,
+          "wer_nulls_as_100pct": 0.0
+        },
+        "gender": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.0,
+          "wer_nulls_as_100pct": 0.0
+        },
+        "religion": {
+          "n": 6,
+          "exact_match": 0.833,
+          "extraction_rate": 0.833,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.1667,
+          "wer_nulls_as_100pct": 0.1667
+        },
+        "marital_status": {
+          "n": 6,
+          "exact_match": 1.0,
+          "extraction_rate": 1.0,
+          "false_accepts": 0,
+          "cer_nulls_as_100pct": 0.0,
+          "wer_nulls_as_100pct": 0.0
+        }
+      },
+      "false_accepts_inside_VERIFIED_results": 0
+    }
+  },
+  "by_condition": {
+    "blur_k7": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 421.9,
+          "median": 421.9,
+          "max": 421.9
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 292.3,
+          "median": 292.3,
+          "max": 292.3
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    },
+    "half_res": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 0.0,
+          "RETRY": 1.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 497.5,
+          "median": 497.5,
+          "max": 497.5
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 271.5,
+          "median": 271.5,
+          "max": 271.5
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    },
+    "jpeg_q30": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 0.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 1.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 402.9,
+          "median": 402.9,
+          "max": 402.9
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 280.1,
+          "median": 280.1,
+          "max": 280.1
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    },
+    "low_light": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 0.0,
+          "RETRY": 1.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 474.3,
+          "median": 474.3,
+          "max": 474.3
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 331.3,
+          "median": 331.3,
+          "max": 331.3
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    },
+    "original": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 0.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 1.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 767.4,
+          "median": 767.4,
+          "max": 767.4
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 314.8,
+          "median": 314.8,
+          "max": 314.8
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    },
+    "rotate_3deg": {
+      "front": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 0.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 1.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 477.3,
+          "median": 477.3,
+          "max": 477.3
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "serial": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0
+          },
+          "birth_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "first_name": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "other_names": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "address_line1": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 1,
+            "cer_nulls_as_100pct": 0.0303,
+            "wer_nulls_as_100pct": 0.1667
+          },
+          "address_line2": {
+            "n": 1,
+            "exact_match": 0.0,
+            "extraction_rate": 0.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 1.0,
+            "wer_nulls_as_100pct": 1.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      },
+      "back": {
+        "images": 1,
+        "decision_rates": {
+          "VERIFIED": 1.0,
+          "RETRY": 0.0,
+          "MANUAL_REVIEW": 0.0,
+          "REJECTED": 0.0
+        },
+        "time_ms": {
+          "mean": 332.0,
+          "median": 332.0,
+          "max": 332.0
+        },
+        "fields": {
+          "national_id": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "issue_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "expiry_date": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0
+          },
+          "job": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "gender": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "religion": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          },
+          "marital_status": {
+            "n": 1,
+            "exact_match": 1.0,
+            "extraction_rate": 1.0,
+            "false_accepts": 0,
+            "cer_nulls_as_100pct": 0.0,
+            "wer_nulls_as_100pct": 0.0
+          }
+        },
+        "false_accepts_inside_VERIFIED_results": 0
+      }
+    }
+  },
+  "rows": [
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "original",
+      "decision": "MANUAL_REVIEW",
+      "processing_ms": 767.4,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "blur_k7",
+      "decision": "VERIFIED",
+      "processing_ms": 421.9,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "low_light",
+      "decision": "RETRY",
+      "processing_ms": 474.3,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "half_res",
+      "decision": "RETRY",
+      "processing_ms": 497.5,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "rotate_3deg",
+      "decision": "MANUAL_REVIEW",
+      "processing_ms": 477.3,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": false,
+          "false_accept": true,
+          "cer": 0.030303030303030304,
+          "wer": 0.16666666666666666
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "front",
+      "condition": "jpeg_q30",
+      "decision": "MANUAL_REVIEW",
+      "processing_ms": 402.9,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "serial": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "birth_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "first_name": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "other_names": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line1": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "address_line2": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "original",
+      "decision": "VERIFIED",
+      "processing_ms": 314.8,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "blur_k7",
+      "decision": "VERIFIED",
+      "processing_ms": 292.3,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "low_light",
+      "decision": "VERIFIED",
+      "processing_ms": 331.3,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "half_res",
+      "decision": "VERIFIED",
+      "processing_ms": 271.5,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": true,
+          "exact": false,
+          "false_accept": false,
+          "cer": null,
+          "wer": null
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "rotate_3deg",
+      "decision": "VERIFIED",
+      "processing_ms": 332.0,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    },
+    {
+      "sample": "sample_01",
+      "side": "back",
+      "condition": "jpeg_q30",
+      "decision": "VERIFIED",
+      "processing_ms": 280.1,
+      "fields": {
+        "national_id": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "issue_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "expiry_date": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false
+        },
+        "job": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "gender": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "religion": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        },
+        "marital_status": {
+          "truth_null": false,
+          "pred_null": false,
+          "exact": true,
+          "false_accept": false,
+          "cer": 0.0,
+          "wer": 0.0
+        }
+      }
+    }
+  ],
+  "variant_comparison": {
+    "front.national_id": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      }
+    },
+    "front.birth_date": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      }
+    },
+    "front.first_name": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "front.other_names": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "front.address_line1": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "front.address_line2": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "front.serial": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 0.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 0.0
+      }
+    },
+    "back.national_id": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      }
+    },
+    "back.issue_date": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 0.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      }
+    },
+    "back.expiry_date": {
+      "original": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": null,
+        "exact_match": 1.0
+      }
+    },
+    "back.job": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "back.gender": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "back.religion": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    },
+    "back.marital_status": {
+      "original": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "gray": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "clahe": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      },
+      "up2": {
+        "n": 1,
+        "cer": 0.0,
+        "exact_match": 1.0
+      }
+    }
+  }
+}

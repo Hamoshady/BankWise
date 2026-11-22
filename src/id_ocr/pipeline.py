@@ -14,13 +14,14 @@ from __future__ import annotations
 import json
 import logging
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import date
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
-from .config import Box, OcrConfig
+from .config import Box, OcrConfig, FieldSpec, KIND_TEXT_LINE
+from .alignment import rectify_card
 from .decision import Decision, DecisionInput, decide
 from .engine import EngineError, OcrEngine, get_engine
 from .extract import PUBLIC_FIELDS, FieldResult, SideResult, extract_side
@@ -98,11 +99,21 @@ class IdOcrPipeline:
         self.cfg = cfg or OcrConfig()
         logging.getLogger("id_ocr").setLevel(self.cfg.log_level)
         self.engine = engine or get_engine(self.cfg)
+        from .numeric import create_numeric
+        self.numeric_recognizer = create_numeric(self.cfg)
+        self.field_detector = None
+        if self.cfg.yolo_weights:
+            from .field_detector import YoloFieldDetector
+            self.field_detector = YoloFieldDetector(self.cfg.yolo_weights, self.cfg.regions)
 
     # ------------------------------------------------------------------ setup
     def warmup(self) -> Dict[str, Any]:
         """Initialise all readers needed by the configured regions (once). May raise EngineError."""
         self.engine.reader("ar")
+        if self.numeric_recognizer:
+            self.numeric_recognizer.warmup()
+        if self.field_detector:
+            self.field_detector.warmup()
         if any(s.kind == "serial" for specs in self.cfg.regions.values() for s in specs):
             self.engine.reader("en")
         return self.engine.info()
@@ -121,6 +132,8 @@ class IdOcrPipeline:
         input_errors: List[str] = []
         sides: Dict[str, SideResult] = {}
         quality: Dict[str, QualityReport] = {}
+        alignment: Dict[str, str] = {}
+        localization = {}
         try:
             for side, src, crop, rot in (("front", front, front_crop, front_rotate), ("back", back, back_crop, back_rotate)):
                 if src is None:
@@ -130,13 +143,60 @@ class IdOcrPipeline:
                     img = rotate_image(img, rot)
                     if crop is not None:
                         img = crop_normalized(img, crop)
+                        alignment[side] = "manual_crop"
+                    elif self.cfg.auto_align_card:
+                        img, alignment[side] = rectify_card(img)
                     quality[side] = assess_quality(img, self.cfg)
-                    sides[side] = extract_side(img, side, self.engine, self.cfg)
+                    located = {}
+                    side_cfg = self.cfg
+                    if self.field_detector and (self.cfg.yolo_always or alignment.get(side) not in ('rectified', 'already_aligned', 'manual_crop')):
+                        detector_image = img
+                        if self.cfg.yolo_stretch_square:
+                            import cv2
+                            detector_image = cv2.resize(img, (512, 512))
+                        located = self.field_detector.locate(detector_image, side)
+                        regions = dict(self.cfg.regions)
+                        regions[side] = [replace(s, box=located[s.name][0]) if s.name in located else s
+                                         for s in regions.get(side, [])]
+                        if side == 'back' and all(n in located for n in ('gender', 'religion', 'marital_status')):
+                            regions[side] = [s for s in regions[side] if s.name != 'attributes']
+                        side_cfg = replace(self.cfg, regions=regions)
+                    localization[side] = {name: {'source': 'yolo', 'confidence': conf}
+                                          for name, (_, conf) in located.items()}
+                    if self.numeric_recognizer:
+                        sides[side] = extract_side(img, side, self.engine, side_cfg,
+                                                  numeric_recognizer=self.numeric_recognizer)
+                    else:
+                        sides[side] = extract_side(img, side, self.engine, side_cfg)
+                    # Separate Thndr attribute boxes avoid compressing a widely spaced row.
+                    # Missing detections retain the existing template result.
+                    if side == 'back':
+                        from .extract import _extract_simple
+                        for name in ('gender', 'religion', 'marital_status'):
+                            if name in located:
+                                spec = FieldSpec(name, side, located[name][0], KIND_TEXT_LINE, ['original'])
+                                fr = _extract_simple(spec, img, self.engine, side_cfg)
+                                fr.flags.append('yolo_localized')
+                                sides[side].fields[name] = fr
+                                if fr.value:
+                                    sides[side].all_text_lines.append(fr.value)
+                    if self.cfg.backend == 'paddle' and alignment.get(side) not in ('rectified', 'already_aligned', 'manual_crop'):
+                        for fr in sides[side].fields.values():
+                            if fr.name in located or (fr.name in ('gender', 'religion', 'marital_status') and 'attributes' in located):
+                                fr.flags.append('yolo_localized')
+                                continue
+                            fr.flags.append('template_localization_unverified')
+                            if fr.status == 'ok':
+                                fr.status = 'low_confidence'
                     del img
                 except ImageError as exc:
                     log.warning("side=%s rejected: %s", side, exc.code)
                     input_errors.append(exc.code)
-            return self._finish(sides, quality, input_errors, attempt, today, t_start, base)
+            result = self._finish(sides, quality, input_errors, attempt, today, t_start, base)
+            result.public["diagnostics"]["card_alignment"] = alignment
+            result.public["diagnostics"]["field_localization"] = localization
+            result.public["diagnostics"]["yolo"] = 'enabled' if self.field_detector else 'disabled_requires_trained_weights'
+            return result
         except EngineError:
             raise
         except Exception as exc:  # unexpected: never leak details to the caller's end user
@@ -220,6 +280,11 @@ class IdOcrPipeline:
             "input_errors": input_errors,
             "note": SCOPE_NOTE,
         }
+        public["validation"]["field_metadata"] = {
+            n: {"ocr_confidence": fr.confidence, "attempt_count": len(fr.candidates),
+                "status": {"ok": "verified_format", "conflict": "conflicting"}.get(fr.status, fr.status),
+                "manual_review_required": fr.status != "ok" or bool(fr.flags and "candidate_conflict" in fr.flags)}
+            for n, fr in fields.items()}
         public["decision"] = decision.as_dict()
         eng = self.engine.info()
         public["diagnostics"] = {

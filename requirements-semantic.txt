@@ -1,0 +1,4 @@
+# Optional local semantic retrieval and evidence-selecting LLM; no cloud APIs.
+transformers>=4.51,<5
+huggingface-hub>=0.34,<1
+safetensors>=0.5,<1

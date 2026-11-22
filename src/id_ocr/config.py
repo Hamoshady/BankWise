@@ -39,16 +39,16 @@ def _default_specs() -> Dict[str, List[FieldSpec]]:
     front = [
         FieldSpec("national_id", "front", (0.40, 0.74, 0.97, 0.86), KIND_DIGITS, ["gray", "up2"], True),
         FieldSpec("birth_date", "front", (0.05, 0.72, 0.35, 0.85), KIND_DATE, ["gray", "up2"]),
-        FieldSpec("first_name", "front", (0.78, 0.25, 0.97, 0.33), KIND_TEXT_LINE, ["gray", "clahe"], True),
-        FieldSpec("other_names", "front", (0.50, 0.33, 0.97, 0.45), KIND_TEXT_LINE, ["gray", "clahe"], True),
-        FieldSpec("address_line1", "front", (0.42, 0.455, 0.97, 0.55), KIND_TEXT_LINE, ["gray", "clahe"]),
-        FieldSpec("address_line2", "front", (0.42, 0.545, 0.97, 0.645), KIND_TEXT_LINE, ["gray", "clahe"]),
+        FieldSpec("first_name", "front", (0.76, 0.24, 0.97, 0.36), KIND_TOKENS, ["gray", "clahe"], True),
+        FieldSpec("other_names", "front", (0.50, 0.33, 0.97, 0.45), KIND_TOKENS, ["gray", "clahe"], True),
+        FieldSpec("address_line1", "front", (0.42, 0.455, 0.97, 0.55), KIND_TOKENS, ["gray", "clahe"]),
+        FieldSpec("address_line2", "front", (0.42, 0.545, 0.97, 0.645), KIND_TOKENS, ["gray", "clahe"]),
         FieldSpec("serial", "front", (0.08, 0.87, 0.40, 0.98), KIND_SERIAL, ["gray", "original"]),
     ]
     back = [
         FieldSpec("national_id", "back", (0.45, 0.04, 0.80, 0.16), KIND_DIGITS, ["gray", "up2"], True),
         FieldSpec("issue_date", "back", (0.25, 0.04, 0.43, 0.16), KIND_DATE, ["gray", "up2"]),
-        FieldSpec("expiry_date", "back", (0.30, 0.46, 0.52, 0.56), KIND_DATE, ["gray", "clahe"]),
+        FieldSpec("expiry_date", "back", (0.30, 0.45, 0.55, 0.57), KIND_DATE, ["gray", "clahe"]),
         FieldSpec("job", "back", (0.60, 0.12, 0.85, 0.23), KIND_TOKENS, ["gray", "clahe"]),
         FieldSpec("attributes", "back", (0.30, 0.28, 0.85, 0.42), KIND_ATTRIBUTES, ["clahe", "gray"]),
     ]
@@ -79,6 +79,21 @@ DEFAULT_GOVERNORATES: Dict[str, str] = {
 
 @dataclass
 class OcrConfig:
+    backend: str = "easyocr"  # Paddle is opt-in until benchmark acceptance.
+    paddle_model_dir: Optional[str] = None
+    cpu_threads: int = 4
+    numeric_backend: Optional[str] = None  # experimental, never enabled by the API defaults
+    numeric_weights: Optional[str] = None
+    numeric_preprocess: str = 'original'
+    numeric_crop_padding: float = 0.0  # horizontal fraction of numeric field width, experimental only
+    # Trusted, custom-trained local detection weights only; absent means disabled.
+    yolo_weights: Optional[str] = None
+    yolo_always: bool = False  # experimental comparison; normal behavior remains alignment fallback
+    yolo_stretch_square: bool = False  # match a stretched dataset export only when explicitly configured
+    # Lightweight mode is automatically used with Paddle; opt-in for controlled comparisons.
+    lightweight: bool = False
+    crop_margin: float = 0.0  # fraction of card dimensions; configurable, default preserves existing crops
+
     # --- engine / GPU -----------------------------------------------------
     use_gpu: bool = True
     allow_cpu_fallback: bool = False      # explicit opt-in recovery option
@@ -98,6 +113,8 @@ class OcrConfig:
     clahe_clip: float = 2.0
     clahe_grid: int = 8
     line_padding_px: int = 12             # replicate-border padding for line crops
+
+    auto_align_card: bool = True          # conservative card-boundary rectification; manual crop takes precedence
 
     # --- OCR / confidence -------------------------------------------------
     decoder: str = "beamsearch"           # EasyOCR decoder: "greedy" | "beamsearch"

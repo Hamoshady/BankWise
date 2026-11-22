@@ -1,0 +1,119 @@
+{
+  "dataset": "PKDD99 Financial / CTU",
+  "source_url": "https://relational.fel.cvut.cz/dataset/Financial",
+  "downloaded_at": "2026-11-15T15:13:33.261240+00:00",
+  "license": "Not explicitly specified by upstream; local research use, no redistribution.",
+  "tables": {
+    "district": {
+      "rows": 77,
+      "columns": [
+        "district_id",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A15",
+        "A16"
+      ],
+      "bytes": 2996,
+      "sha256": "d2ef1992a5f5a13286ca0557e04e5f79e869bde043b40ba46c261863ec6b7025"
+    },
+    "client": {
+      "rows": 5369,
+      "columns": [
+        "client_id",
+        "gender",
+        "birth_date",
+        "district_id"
+      ],
+      "bytes": 37408,
+      "sha256": "bf452db084a47e2263736a3d075351a5740e56dabefab1d6fec0e5692993b4e6"
+    },
+    "account": {
+      "rows": 4500,
+      "columns": [
+        "account_id",
+        "district_id",
+        "frequency",
+        "date"
+      ],
+      "bytes": 30010,
+      "sha256": "6737a0a04d4d23070ee99835d7e49a7b2a2938e9defb2fc8ca07c0af3b640d1f"
+    },
+    "disp": {
+      "rows": 5369,
+      "columns": [
+        "disp_id",
+        "client_id",
+        "account_id",
+        "type"
+      ],
+      "bytes": 36381,
+      "sha256": "90b0615746e9c8e8eb4a20e0e8b8606572c3c0c24cbde36d8d97778873722701"
+    },
+    "card": {
+      "rows": 892,
+      "columns": [
+        "card_id",
+        "disp_id",
+        "type",
+        "issued"
+      ],
+      "bytes": 7235,
+      "sha256": "822f54ed7cf1c9afc4de415598d5751c8bea87b31f7dd1e3e30c2f6ace3fb980"
+    },
+    "loan": {
+      "rows": 682,
+      "columns": [
+        "loan_id",
+        "account_id",
+        "date",
+        "amount",
+        "duration",
+        "payments",
+        "status"
+      ],
+      "bytes": 10426,
+      "sha256": "ef600eea61dd39b950aa1de8a09e0bc540e85d41ae5421f1ea6b9007e4c5a4c1"
+    },
+    "order": {
+      "rows": 6471,
+      "columns": [
+        "order_id",
+        "account_id",
+        "bank_to",
+        "account_to",
+        "amount",
+        "k_symbol"
+      ],
+      "bytes": 87430,
+      "sha256": "c7106d86bbc59bf48cffb193a1b9ebfe7a202521472b06494244d09ab374e757"
+    },
+    "trans": {
+      "rows": 1056320,
+      "columns": [
+        "trans_id",
+        "account_id",
+        "date",
+        "type",
+        "operation",
+        "amount",
+        "balance",
+        "k_symbol",
+        "bank",
+        "account"
+      ],
+      "bytes": 11256246,
+      "sha256": "7ecfe2f9208e205d49bf65f2c0f995b2f45bde8d07611084a367e0cf58a33d62"
+    }
+  }
+}

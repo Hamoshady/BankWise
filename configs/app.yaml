@@ -26,8 +26,25 @@ storage:
 
 # In-memory limits for development and tests. Not shared across processes (see core/rate_limit.py).
 rate_limits:
+  rag_read:
+    limit: 30
+    window_seconds: 60
+  rag_write:
+    limit: 10
+    window_seconds: 60
   auth_attempt:
     limit: 5
+    window_seconds: 60
+  # Two-factor login: generation/resend are charged per client and per account, verification per client
+  # and per challenge (each challenge additionally allows at most 5 wrong codes).
+  otp_generation:
+    limit: 5
+    window_seconds: 60
+  otp_resend:
+    limit: 3
+    window_seconds: 300
+  otp_verify:
+    limit: 10
     window_seconds: 60
   identity_submit:
     limit: 10

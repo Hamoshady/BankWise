@@ -7,7 +7,8 @@ Resolution policy (deliberately conservative):
   * every candidate keeps its raw OCR text, normalised text, parsed value,
     per-detection confidence, variant and reader;
   * if independent attempts produce DIFFERENT valid values the field is
-    ``conflict`` and its value is None - nothing is picked because it "looks valid";
+    ``conflict`` and its value is None. A first-name segmentation recovery may
+    retain a supported value as ``low_confidence`` with the original conflict flag;
   * agreement of several variants of the same crop is reported as ``ok`` but
     is NOT proof of correctness (they share the same model and pixels);
   * ``confidence`` is the minimum per-detection confidence of the supporting
@@ -18,7 +19,7 @@ from __future__ import annotations
 import logging
 import os
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from difflib import SequenceMatcher
 from typing import Dict, List, Optional, Tuple
 
@@ -32,7 +33,7 @@ from .image_io import crop_normalized
 from .normalize import (clean_arabic_line, digits_only, has_arabic_letters, match_key, normalize_serial,
                         normalize_unicode, to_western_digits)
 from .preprocess import make_variant
-from .validation import parse_date
+from .validation import parse_date, decode_national_id
 
 log = logging.getLogger("id_ocr.extract")
 
@@ -188,6 +189,8 @@ def _read_candidate(spec: FieldSpec, crop: np.ndarray, variant: str, engine: Ocr
 
 
 def _extract_simple(spec: FieldSpec, img: np.ndarray, engine: OcrEngine, cfg: OcrConfig) -> FieldResult:
+    if cfg.backend == 'paddle' or cfg.lightweight:
+        return _extract_lightweight(spec, img, engine, cfg)
     crop = crop_normalized(img, spec.box)
     _debug_save(cfg, spec, crop)
     region_px = _region_px(img, spec.box)
@@ -207,9 +210,126 @@ def _extract_simple(spec: FieldSpec, img: np.ndarray, engine: OcrEngine, cfg: Oc
             if fr.status in ("ok", "conflict"):
                 break
 
+    if spec.name == 'first_name' and spec.kind == KIND_TOKENS and fr.status in ('unreadable', 'invalid', 'conflict', 'low_confidence'):
+        fr = _recover_name_line(spec, img, engine, cfg, fr)
+    if spec.name == 'expiry_date' and fr.status in ('unreadable', 'invalid', 'single_read', 'low_confidence'):
+        fr = _labelled_expiry(spec, img, engine, cfg, fr)
     if spec.kind == KIND_SERIAL and fr.value:
         _serial_checks(fr, crop, engine, cfg)
     return fr  # note: pattern-valid but wrong serials cannot be detected here
+
+
+
+
+def _extract_lightweight(spec, img, engine, cfg):
+    """Single minimal read, at most two selective retries; no full-image detection."""
+    numeric = spec.kind in (KIND_DIGITS, KIND_DATE)
+    threshold = max(cfg.min_numeric_conf if numeric else cfg.min_text_conf, .85 if numeric else .8)
+    local_cfg = replace(cfg, min_numeric_conf=threshold, min_text_conf=threshold)
+    candidates = []
+    crop = crop_normalized(img, spec.box)
+    for variant in ['original', 'clahe', 'up2'][:1 + min(max(cfg.max_rereads, 0), 2)]:
+        cand = _read_candidate(spec, crop, variant, engine, cfg, _region_px(img, spec.box))
+        if spec.kind == KIND_DIGITS:
+            # Reject embedded letters rather than silently dropping uncertain characters.
+            if re.search(r'[^0-9\s]', to_western_digits(normalize_unicode(cand.raw))):
+                cand.value = None
+                cand.notes.append('numeric_unexpected_characters')
+            if cand.value and not decode_national_id(cand.value, cfg).valid:
+                cand.value = None
+                cand.notes.append('national_id_structure_invalid')
+        if spec.name == 'expiry_date' and cand.value and parse_date(cand.value).precision != 'day':
+            cand.value = None
+            cand.notes.append('expiry_day_missing')
+        candidates.append(cand)
+        fr = resolve(spec.name, spec.side, candidates, local_cfg, numeric,
+                     text=spec.kind in (KIND_TOKENS, KIND_TEXT_LINE))
+        if fr.value and fr.confidence >= threshold and fr.status != 'conflict':
+            fr.status = 'ok'
+            fr.flags.append('single_pass_format_check' if len(candidates) == 1 else 'selective_retry')
+            break
+    # No universal serial pattern: preserve the read and flag it for review.
+    if spec.kind == KIND_SERIAL and fr.value:
+        fr.status = 'low_confidence'
+        fr.flags.append('serial_format_unverified')
+    return fr
+
+
+def _recover_name_line(spec, img, engine, cfg, original):
+    """A detector can split a short word into bogus tokens; retry whole-line recognition.
+
+    Require agreement of both line reads and support from an existing candidate if
+    the original was conflicted. Retain the disagreement and mark the output for review.
+    """
+    line_spec = replace(spec, kind=KIND_TEXT_LINE)
+    crop = crop_normalized(img, spec.box)
+    reads = [_read_candidate(line_spec, crop, variant, engine, cfg, _region_px(img, spec.box))
+             for variant in ('gray', 'clahe')]
+    recovered = resolve(spec.name, spec.side, reads, cfg, numeric=False, text=True)
+    supported = {c.value for c in original.candidates if c.value}
+    if recovered.status != 'ok' or (supported and recovered.value not in supported):
+        return original
+    recovered.candidates = original.candidates + reads
+    recovered.flags = list(dict.fromkeys(original.flags + recovered.flags + ['line_segmentation_recovery']))
+    recovered.source = 'line_segmentation_recovery'
+    if original.status == 'conflict':
+        recovered.status = 'low_confidence'  # do not conceal the detector/recognizer disagreement
+    return recovered
+
+
+def _labelled_expiry(spec, img, engine, cfg, original):
+    """Locate the printed 'valid until' label, then read the digits to its left.
+
+    Do not shorten/truncate digit strings to force a valid date, infer from issue
+    date, or use any person's expected value. Only fully parsed day dates qualify.
+    """
+    if not hasattr(engine, 'read_layout'):
+        return original
+    search = (.18, .36, .88, .64)
+    context = crop_normalized(img, search)
+    h, w = img.shape[:2]
+    xoffset, yoffset = int(search[0]*w), int(search[1]*h)
+    boxes = []
+    for variant in ('gray', 'clahe'):
+        for read in engine.read_layout(make_variant(context, variant, cfg)):
+            key = match_key(read.text)
+            if digits_only(read.text) or not key.endswith(match_key('حتى')):
+                continue
+            if read.conf < cfg.min_text_conf:
+                continue
+            x0, y0, _, y1 = read.bbox
+            # The left edge of this Arabic label is immediately after the date.
+            right = xoffset+x0-2
+            left = max(int(.18*w), right-int(.22*w))
+            top, bottom = max(0,yoffset+y0-int(.03*h)), min(h,yoffset+y1+int(.02*h))
+            if right-left < .12*w or bottom-top < 10:
+                continue
+            box = (left/w, top/h, right/w, bottom/h)
+            if box not in boxes: boxes.append(box)
+    cands = []
+    for box in boxes[:2]:
+        located = replace(spec, box=box)
+        crop = crop_normalized(img, box)
+        for variant in ('gray', 'clahe'):
+            candidate = _read_candidate(located, crop, variant, engine, cfg, _region_px(img, box))
+            if candidate.value and parse_date(candidate.value).precision != 'day':
+                candidate.value = None
+                candidate.notes.append('expiry_day_missing')
+            candidate.notes.append('expiry_label_localized')
+            cands.append(candidate)
+    if not cands: return original
+    original.candidates.extend(cands)
+    recovered = resolve(spec.name, spec.side, original.candidates, cfg, numeric=True)
+    # Never overwrite a different valid region result or ignore a date conflict.
+    if recovered.status != 'ok':
+        if recovered.status == 'conflict':
+            original.value, original.status = None, 'conflict'
+            original.flags.append('candidate_conflict')
+        return original
+    recovered.candidates = list(original.candidates)
+    recovered.source = 'expiry_label_localized'
+    recovered.flags.append('layout_recovery')
+    return recovered
 
 
 def _serial_checks(fr: FieldResult, crop: np.ndarray, engine: OcrEngine, cfg: OcrConfig) -> None:
@@ -249,7 +369,9 @@ def _extract_attributes(spec: FieldSpec, img: np.ndarray, engine: OcrEngine, cfg
     region_px = _region_px(img, spec.box)
     per_field: Dict[str, List[Candidate]] = {f: [] for f in cfg.vocab}
     unmatched: List[str] = []
-    for variant in spec.variants:
+    lightweight = cfg.backend == 'paddle' or cfg.lightweight
+    variants = ['original', 'clahe', 'up2'][:1 + min(max(cfg.max_rereads, 0), 2)] if lightweight else spec.variants
+    for variant in variants:
         v = make_variant(crop, variant, cfg)
         reads = sorted(engine.read_tokens(v, "ar"), key=lambda r: -r.bbox[2])
         best_by_field: Dict[str, Candidate] = {}
@@ -268,7 +390,15 @@ def _extract_attributes(spec: FieldSpec, img: np.ndarray, engine: OcrEngine, cfg
                     best_by_field[fld] = cand
         for fld, c in best_by_field.items():
             per_field[fld].append(c)
-    out = {f: resolve(f, spec.side, c, cfg, numeric=False, text=False) for f, c in per_field.items()}
+        if lightweight and all(per_field[f] and per_field[f][-1].conf >= .8 for f in per_field):
+            break
+    out = {f: resolve(f, spec.side, c, replace(cfg, min_text_conf=max(.8, cfg.min_text_conf)) if lightweight else cfg,
+                      numeric=False, text=False) for f, c in per_field.items()}
+    if lightweight:
+        for fr in out.values():
+            if fr.status == 'single_read' and fr.confidence >= .8:
+                fr.status = 'ok'
+                fr.flags.append('single_pass_format_check')
     return out, unmatched
 
 
@@ -306,32 +436,49 @@ def _national_id_fallback(img: np.ndarray, side: str, engine: OcrEngine, cfg: Oc
     return fr
 
 
-def extract_side(img: np.ndarray, side: str, engine: OcrEngine, cfg: OcrConfig) -> SideResult:
+def extract_side(img: np.ndarray, side: str, engine: OcrEngine, cfg: OcrConfig, numeric_recognizer=None) -> SideResult:
     import time
     t0 = time.perf_counter()
     fields: Dict[str, FieldResult] = {}
     lines: List[str] = []
     for spec in cfg.regions.get(side, []):
+        if cfg.crop_margin:
+            margin = max(0., min(cfg.crop_margin, .02))
+            x0, y0, x1, y1 = spec.box
+            spec = replace(spec, box=(max(0., x0-margin), max(0., y0-margin), min(1., x1+margin), min(1., y1+margin)))
         if spec.kind == KIND_ATTRIBUTES:
             sub, unmatched = _extract_attributes(spec, img, engine, cfg)
             fields.update(sub)
             row = [r.value for r in (sub.get(f) for f in ("gender", "religion", "marital_status")) if r and r.value]
             lines.append(" ".join(row + unmatched))
             continue
-        fr = _extract_simple(spec, img, engine, cfg)
+        if spec.kind == KIND_DIGITS and numeric_recognizer is not None:
+            from .numeric import pad_field_box
+            spec = replace(spec, box=pad_field_box(spec.box, cfg.numeric_crop_padding))
+            reading = numeric_recognizer.recognize(crop_normalized(img, spec.box))
+            candidate = Candidate(raw=reading['raw_text'], normalized=reading['normalized_text'],
+                value=reading['value'] if reading['valid_structure'] else None,
+                conf=reading['confidence'] or 0., variant=cfg.numeric_preprocess,
+                reader=reading['backend'], bbox=_region_px(img,spec.box), notes=reading['flags'])
+            fr = resolve(spec.name, side, [candidate], replace(cfg,min_numeric_conf=.85),numeric=True)
+            if reading['requires_review'] and fr.value:
+                fr.status = 'low_confidence'
+            fr.flags.append('experimental_numeric_backend')
+        else:
+            fr = _extract_simple(spec, img, engine, cfg)
         fields[spec.name] = fr
         if fr.value and spec.kind != KIND_DIGITS:
             lines.append(fr.value)
 
     nid = fields.get("national_id")
-    if (nid is not None and cfg.full_image_pass in ("fallback", "always")
+    if (numeric_recognizer is None and getattr(engine, 'supports_detection', True) and not cfg.lightweight and nid is not None and cfg.full_image_pass in ("fallback", "always")
             and nid.status in ("unreadable", "invalid")):
         fb = _national_id_fallback(img, side, engine, cfg)
         if fb.value or fb.status == "conflict":
             fb.flags.append("fallback_used")
             fields["national_id"] = fb
 
-    if cfg.full_image_pass == "always":
+    if getattr(engine, "supports_detection", True) and not cfg.lightweight and cfg.full_image_pass == "always":
         for row in _full_image_rows(img, engine, cfg):
             row.sort(key=lambda r: -r.bbox[2])
             txt, _ = clean_arabic_line(" ".join(r.text for r in row))

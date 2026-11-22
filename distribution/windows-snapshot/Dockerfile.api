@@ -1,0 +1,8 @@
+FROM bankwise-share:api
+USER root
+COPY src/ /app/src/
+COPY configs/ /app/configs/
+COPY alembic.ini pyproject.toml requirements.txt /app/
+COPY distribution/windows-snapshot/serve.py distribution/windows-snapshot/initialize.py /opt/share/
+RUN sed -i 's/single_process: false/single_process: true/' /app/configs/app.yaml
+USER bankwise

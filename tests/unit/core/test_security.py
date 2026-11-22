@@ -27,7 +27,10 @@ def test_each_role_gets_exactly_its_permissions(authorizer):
         "operator": {"identity:submit", "identity:read"},
         "reviewer": {"identity:read", "identity:review", "identity:view_sensitive"},
         "auditor": {"audit:read"},
-        "admin": {"admin:manage"},
+        "admin": {"admin:manage", "identity:approve_account", "demo:deposit"},
+        "applicant": {"onboarding:own"},
+        "demo_treasurer": {"demo:deposit"},
+        "identity_reviewer": {"identity:approve_account"},
     }
     for role, allowed in matrix.items():
         for permission in authorizer.policy.permissions:

@@ -1,0 +1,59 @@
+{
+  "classes": {
+    "0": "Add1",
+    "1": "Add2",
+    "2": "Back",
+    "3": "ExpDate",
+    "4": "First_Name",
+    "5": "Front",
+    "6": "Gender",
+    "7": "HusbandName",
+    "8": "ID",
+    "9": "IssueDate",
+    "10": "Job1",
+    "11": "Job2",
+    "12": "Last_Name",
+    "13": "Religion",
+    "14": "Serial_Num",
+    "15": "Status"
+  },
+  "images_by_split": {
+    "train": 4071,
+    "valid": 194,
+    "test": 98
+  },
+  "boxes_by_class": {
+    "Job1": 1524,
+    "Gender": 1513,
+    "Religion": 1513,
+    "Status": 1469,
+    "ExpDate": 1499,
+    "IssueDate": 1494,
+    "Back": 1038,
+    "Job2": 645,
+    "HusbandName": 231,
+    "Last_Name": 2888,
+    "Add1": 2892,
+    "Add2": 2900,
+    "ID": 2909,
+    "Serial_Num": 2834,
+    "First_Name": 2888,
+    "Front": 150
+  },
+  "image_dimensions": {
+    "512x512": 4363
+  },
+  "issues": {
+    "non_box_polygon_rows": 101
+  },
+  "exact_duplicate_groups": 11,
+  "cross_split_exact_duplicate_groups": 0,
+  "training_approved": false,
+  "remaining_checks": [
+    "actual field box overlays",
+    "license/provenance files",
+    "near-duplicates and identity grouping",
+    "independent test identities",
+    "class mapping including front/back ID and multi-line occupation"
+  ]
+}

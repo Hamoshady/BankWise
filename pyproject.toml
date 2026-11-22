@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bankwise-ai"
+version = "0.3.0"
+description = "Local Egyptian identity OCR with a secured REST API"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["bankwise*", "id_ocr*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[project.optional-dependencies]
+semantic = ["transformers>=4.51,<5", "huggingface-hub>=0.34,<1", "safetensors>=0.5,<1"]

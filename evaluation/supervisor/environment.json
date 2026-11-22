@@ -1,0 +1,22 @@
+{
+  "cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+  "ram_bytes": 24078729216,
+  "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.43",
+  "cpu_threads_per_model": 4,
+  "baseline_api_container": {
+    "BlockIO": "550MB / 77.8kB",
+    "CPUPerc": "0.34%",
+    "Container": "bankwise-api-local",
+    "ID": "a12a68b7b779",
+    "MemPerc": "31.33%",
+    "MemUsage": "7.026GiB / 22.43GiB",
+    "Name": "bankwise-api-local",
+    "NetIO": "0B / 0B",
+    "PIDs": "53"
+  },
+  "llama_release": "b12359",
+  "model_revision": "8d43d974efc48399cb58957ad49c8b26bf5a109c",
+  "new_model_quantization": "Q4_K_M",
+  "baseline_model_dtype": "float32",
+  "gpu_used": false
+}

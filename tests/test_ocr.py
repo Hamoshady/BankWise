@@ -120,6 +120,9 @@ def front_script(nid=NID, birth="2000/01/01", **over):
     }
     tokens = {FRONT_LEVELS["serial"]: [R(SERIAL, 0.9, (0, 0, 50, 10))]}
     lines.update({FRONT_LEVELS[k]: v for k, v in over.items() if k in FRONT_LEVELS})
+    # Printed Arabic lines now use detection before recognition, like the job field.
+    tokens.update({FRONT_LEVELS[k]: lines[FRONT_LEVELS[k]] for k in
+                   ("first_name", "other_names", "address_line1", "address_line2")})
     return FakeEngine(lines, tokens)
 
 

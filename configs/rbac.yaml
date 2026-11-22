@@ -5,6 +5,13 @@
 # no other role has it, and the role is not a default for anyone.
 
 permissions:
+  - onboarding:own
+  - demo:deposit
+  - identity:approve_account
+  - identity:read_own_upload
+  - assistant:use
+  - rag:read
+  - rag:write
   - identity:submit
   - identity:read
   - identity:view_sensitive
@@ -14,6 +21,13 @@ permissions:
   - admin:manage
 
 roles:
+  customer:
+    - identity:read_own_upload
+    - assistant:use
+    - rag:read
+  knowledge_user:
+    - rag:read
+    - rag:write
   operator:
     - identity:submit
     - identity:read
@@ -23,7 +37,16 @@ roles:
     - identity:view_sensitive
   auditor:
     - audit:read
+  applicant:
+    - onboarding:own
+  demo_treasurer:
+    - demo:deposit
   admin:
     - "admin:*"
+    - demo:deposit
+    - identity:approve_account
   identity_processor:
     - identity:process
+
+  identity_reviewer:
+    - identity:approve_account

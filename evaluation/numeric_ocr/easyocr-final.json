@@ -1,0 +1,237 @@
+{
+  "engine": "easyocr",
+  "strategy": "original",
+  "crop_padding": 0.0,
+  "crop_sha256": "11476c658591904913f80f0287cfa2f24420f124ee0bfa3672feb9dd01110a54",
+  "repeats": 3,
+  "cpu_threads": 4,
+  "opencv": "5.1.0",
+  "init_seconds": 3.529646499000137,
+  "numeric_metrics": {
+    "count": 6,
+    "exact_match": 0.6666666666666666,
+    "cer": 0.03571428571428571,
+    "invalid_length_rate": 0.3333333333333333,
+    "missing_digit_rate": 0.0,
+    "extra_digit_rate": 0.3333333333333333,
+    "substitutions_per_gt_digit": 0.011904761904761904,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 0.5
+  },
+  "dev_metrics": {
+    "count": 4,
+    "exact_match": 0.5,
+    "cer": 0.05357142857142857,
+    "invalid_length_rate": 0.5,
+    "missing_digit_rate": 0.0,
+    "extra_digit_rate": 0.5,
+    "substitutions_per_gt_digit": 0.017857142857142856,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 0.75
+  },
+  "reserved_diagnostic_metrics": {
+    "count": 2,
+    "exact_match": 1.0,
+    "cer": 0.0,
+    "invalid_length_rate": 0.0,
+    "missing_digit_rate": 0.0,
+    "extra_digit_rate": 0.0,
+    "substitutions_per_gt_digit": 0.0,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 0.0
+  },
+  "recognition_mean_seconds": 0.2712273406666681,
+  "recognition_p95_seconds": 0.3603480434000175,
+  "recognition_peak_ram_mb": 928.7265625,
+  "pipeline_extra_init_seconds": 1.3756857700000182,
+  "pair_mean_seconds": 13.839999932444446,
+  "pair_p95_seconds": 16.39300241420001,
+  "pipeline_peak_ram_mb": 1320.8515625,
+  "pipeline_metrics": {
+    "count": 3,
+    "exact_match": 0.6666666666666666,
+    "missing_or_conflicting_rate": 0.3333333333333333,
+    "manual_review_rate": 0.6666666666666666,
+    "incorrect_but_accepted_rate": 0.0
+  },
+  "diagnostics": [
+    {
+      "sample": "A.front",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        123,
+        912,
+        3
+      ],
+      "exact_match": true,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "confidence": 0.9978702532362431,
+      "flags": [],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "A.back",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        118,
+        560,
+        3
+      ],
+      "exact_match": true,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "confidence": 0.9759318947852482,
+      "flags": [],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "B.front",
+      "alignment": "rectified",
+      "crop_shape": [
+        102,
+        777,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 15,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 1
+      },
+      "confidence": 0.8395858754658572,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "B.back",
+      "alignment": "rectified",
+      "crop_shape": [
+        84,
+        398,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 15,
+      "edit_counts": {
+        "substitutions": 1,
+        "missing": 0,
+        "extra": 1
+      },
+      "confidence": 0.9079272921397511,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "C.front",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        123,
+        912,
+        3
+      ],
+      "exact_match": true,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "confidence": 0.664041924478328,
+      "flags": [],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "C.back",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        122,
+        560,
+        3
+      ],
+      "exact_match": true,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "confidence": 0.9976400924746649,
+      "flags": [],
+      "reversed_sequence": false
+    }
+  ],
+  "pair_diagnostics": [
+    {
+      "sample": "A",
+      "exact_match": true,
+      "status": "ok",
+      "manual_review": true,
+      "sides": {
+        "front": {
+          "status": "ok",
+          "flags": []
+        },
+        "back": {
+          "status": "ok",
+          "flags": []
+        }
+      }
+    },
+    {
+      "sample": "B",
+      "exact_match": false,
+      "status": "conflict",
+      "manual_review": true,
+      "sides": {
+        "front": {
+          "status": "single_read",
+          "flags": [
+            "national_id_length_15",
+            "some_attempts_unreadable",
+            "reread_used"
+          ]
+        },
+        "back": {
+          "status": "single_read",
+          "flags": [
+            "national_id_length_15",
+            "some_attempts_unreadable",
+            "reread_used"
+          ]
+        }
+      }
+    },
+    {
+      "sample": "C",
+      "exact_match": true,
+      "status": "ok",
+      "manual_review": false,
+      "sides": {
+        "front": {
+          "status": "ok",
+          "flags": []
+        },
+        "back": {
+          "status": "ok",
+          "flags": []
+        }
+      }
+    }
+  ],
+  "model_bytes": 298553044,
+  "limitation": "Only two real identities, previously seen in earlier diagnostics; no independent final real test set."
+}

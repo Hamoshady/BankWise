@@ -327,7 +327,8 @@ def test_the_factory_builds_the_pipeline_with_safe_settings(monkeypatch):
     monkeypatch.setitem(sys.modules, "id_ocr", module)
     adapter = create_id_ocr_adapter(model_dir="models", use_gpu=False, allow_cpu_fallback=True)
     assert created["cfg"] == {"use_gpu": False, "allow_cpu_fallback": True, "model_dir": "models",
-                              "download_models": False, "debug_dir": None}
+                              "download_models": False, "debug_dir": None, "backend": "easyocr",
+                              "paddle_model_dir": None, "cpu_threads": 4, "yolo_weights": None}
     assert created["warmed"] is True and isinstance(adapter, IdOcrAdapter)
     created.clear()
     create_id_ocr_adapter(warm_up=False)

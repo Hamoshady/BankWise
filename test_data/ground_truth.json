@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "labels_verified": false,
+    "description": "Ground truth for the images in this folder. Keys follow the public output schema. Dates are ISO (YYYY-MM or YYYY-MM-DD). null means the field is intentionally absent/unreadable and must NOT be filled by the OCR.",
+    "WARNING_DRAFT_LABELS": "These labels were transcribed by an AI assistant from the two sample photos and have NOT been checked by a human. Check every value against the physical card, then set labels_verified to true. Until then all accuracy numbers are PROVISIONAL.",
+    "WARNING_PII": "This file contains the identity data printed on the sample card. Do not commit it to a public repository.",
+    "how_to_add_images": "Copy the image into this folder, add an entry to 'samples' with front/back file names and the *_truth objects. Only include fields you have verified by eye; omit a key to exclude it from scoring."
+  },
+  "samples": [
+    {
+      "id": "sample_01",
+      "front": "front_sample.jpg",
+      "back": "back_sample.jpg",
+      "tags": ["clear", "photo_of_card"],
+      "front_truth": {
+        "first_name": "محمد",
+        "other_names": "ناصر على حسن حسونه",
+        "address_line1": "المرحلة الثالثة جاهز - الشيخ زايد",
+        "address_line2": "الاسماعيليه ثالث - الاسماعيلية",
+        "birth_date": "2005-05-01",
+        "national_id": "30505011900835",
+        "serial": "IX3254438"
+      },
+      "back_truth": {
+        "national_id": "30505011900835",
+        "job": "طالب",
+        "gender": "ذكر",
+        "religion": "مسلم",
+        "marital_status": "أعزب",
+        "issue_date": "2021-07",
+        "expiry_date": "2028-07-05"
+      }
+    }
+  ]
+}

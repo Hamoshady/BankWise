@@ -131,6 +131,13 @@ class IdOcrAdapter:
         if callable(warm):
             warm()
 
+    def close(self) -> None:
+        """Release the locally owned OCR readers on application shutdown."""
+        engine = getattr(self._pipeline, "engine", None)
+        cleanup = getattr(engine, "cleanup", None)
+        if callable(cleanup):
+            cleanup()
+
     def process(self, front_image: bytes, back_image: bytes) -> ProcessorOutput:
         front, back = decode_image(front_image), decode_image(back_image)
         try:
@@ -155,14 +162,15 @@ def protect_ocr_logging(settings: Optional[LoggingSettings] = None, stream: Any 
 
 
 def create_id_ocr_adapter(model_dir: Optional[str] = None, use_gpu: bool = True, allow_cpu_fallback: bool = False,
-                          warm_up: bool = True, log_settings: Optional[LoggingSettings] = None) -> IdOcrAdapter:
+                          warm_up: bool = True, log_settings: Optional[LoggingSettings] = None,
+                          backend: str = "easyocr", paddle_model_dir: Optional[str] = None, cpu_threads: int = 4, yolo_weights: Optional[str] = None) -> IdOcrAdapter:
     """Build the real pipeline with application-safe settings: models are NEVER downloaded while serving
     (`download_models=False`: install them beforehand), no debug crops are saved (`debug_dir=None`), and OCR logging is
     redacted. Mirrors the OcrConfig arguments the project's own CLI uses."""
     from id_ocr import IdOcrPipeline, OcrConfig            # imported here: heavy, and not needed to import this module
 
     cfg = OcrConfig(use_gpu=use_gpu, allow_cpu_fallback=allow_cpu_fallback, model_dir=model_dir,
-                    download_models=False, debug_dir=None)
+                    download_models=False, debug_dir=None, backend=backend, paddle_model_dir=paddle_model_dir, cpu_threads=cpu_threads, yolo_weights=yolo_weights)
     pipeline = IdOcrPipeline(cfg)
     protect_ocr_logging(log_settings)
     adapter = IdOcrAdapter(pipeline)

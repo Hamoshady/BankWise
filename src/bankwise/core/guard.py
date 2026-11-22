@@ -1,8 +1,8 @@
 """SecurityService: the single place an API layer calls to authenticate, rate-limit, authorize and audit.
 
-It is framework-agnostic (plain strings in, `Principal` or a typed error out), so a future FastAPI dependency,
-a CLI wrapper or a worker can all use it. It is NOT wired to anything in this repository yet: no execution path
-is protected until it is called. Order for `guard()`:
+It is framework-agnostic (plain strings in, `Principal` or a typed error out). The API and
+identity service share this instance; no router implements competing security gates.
+Order for `guard()`:
 
     client lockout check -> authenticate -> per-user rate limit -> authorize -> return Principal
 
@@ -14,12 +14,13 @@ is protected until it is called. Order for `guard()`:
 from __future__ import annotations
 
 import logging
+import hashlib
 from typing import Callable, Optional
 
 from bankwise.core.audit import AuditEvent, AuditOutcome, AuditSink
 from bankwise.core.auth import TokenService
 from bankwise.core.errors import AuthenticationError, BankWiseError, ErrorCode, RateLimitExceeded
-from bankwise.core.rate_limit import RateLimiterBackend
+from bankwise.core.rate_limit import RateLimiterBackend, normalise_key
 from bankwise.core.security import Authorizer, Principal
 
 _log = logging.getLogger("bankwise.security")
@@ -42,15 +43,21 @@ def parse_bearer(authorization_header: Optional[str]) -> str:
 
 class SecurityService:
     def __init__(self, tokens: TokenService, authorizer: Authorizer, limiter: RateLimiterBackend,
-                 sink: AuditSink, auth_policy: str = AUTH_POLICY) -> None:
+                 sink: AuditSink, auth_policy: str = AUTH_POLICY,
+                 principal_validator: Optional[Callable[[Principal], None]] = None) -> None:
         self._tokens = tokens
         self._authorizer = authorizer
         self._limiter = limiter
         self._sink = sink
         self._auth_policy = auth_policy
+        self._principal_validator = principal_validator
         self.audit_failures = 0            # operators should alert when this grows
 
     # ------------------------------------------------------------------ public API
+    def limit_public_attempt(self, client_key: str) -> None:
+        """Bound unauthenticated registration before password hashing."""
+        self._limiter.enforce(self._auth_policy, 'signup:' + client_key)
+
     def authenticate(self, authorization_header: Optional[str], client_key: str) -> Principal:
         state = self._limiter.peek(self._auth_policy, client_key)
         if not state.allowed:
@@ -58,7 +65,10 @@ class SecurityService:
             raise RateLimitExceeded("client locked out after repeated authentication failures",
                                     state.retry_after_seconds)
         try:
-            return self._tokens.authenticate(parse_bearer(authorization_header))
+            principal = self._tokens.authenticate(parse_bearer(authorization_header))
+            if self._principal_validator is not None:
+                self._principal_validator(principal)
+            return principal
         except AuthenticationError as error:
             self._limiter.acquire(self._auth_policy, client_key)
             self._audit("auth.failed", AuditOutcome.FAILURE, error_code=error.code.value,
@@ -79,11 +89,56 @@ class SecurityService:
         return principal
 
     def issue_token(self, principal: Principal) -> str:
-        """For the future login handler, AFTER credentials were verified. Audited, and fail-closed: if the audit
+        """For login, AFTER credentials were verified. Audited, and fail-closed: if the audit
         record cannot be written the token is NOT returned (issuance without a record would break the guarantee)."""
         token = self._tokens.issue(principal)
         self._audit("auth.token_issued", AuditOutcome.SUCCESS, strict=True, actor_id=principal.subject_id)
         return token
+
+    def login(self, username: str, password: str, client_key: str,
+              verifier: Callable[[str, str], Optional[Principal]]) -> Principal:
+        """Step 1 of two-factor login: verify credentials and return the identity, but ISSUE NO TOKEN.
+
+        A fully privileged token is created only by `issue_token` after OTP verification. Both budgets precede
+        Argon2 work: login attempts (including successes) use the same client budget as failed bearer
+        authentication, and the account budget uses an opaque digest, never the username in logs/audit metadata.
+        """
+        username = normalise_key(username)
+        account_key = "login:" + hashlib.sha256(username.encode("utf-8")).hexdigest()
+        for key in (client_key, account_key):
+            try:
+                self._limiter.enforce(self._auth_policy, key)
+            except RateLimitExceeded:
+                self._audit("auth.locked_out", AuditOutcome.DENIED, error_code=ErrorCode.RATE_LIMITED.value)
+                raise
+        principal = verifier(username, password)
+        if principal is None:
+            self._audit("auth.failed", AuditOutcome.FAILURE, error_code=ErrorCode.AUTHENTICATION_FAILED.value,
+                        metadata={"reason": "invalid_credentials"})
+            raise AuthenticationError()
+        return principal
+
+    def limit_otp(self, client_key: str, subject_id: str, policy: str) -> None:
+        """Rate-limit OTP generation/resend by caller and by account (opaque digest, never a phone number)."""
+        account_key = "otp:" + hashlib.sha256(normalise_key(subject_id).encode("utf-8")).hexdigest()
+        for key in (client_key, account_key):
+            try:
+                self._limiter.enforce(policy, key)
+            except RateLimitExceeded:
+                self._audit("rate_limit.exceeded", AuditOutcome.DENIED, actor_id=subject_id,
+                            error_code=ErrorCode.RATE_LIMITED.value, metadata={"policy": policy})
+                raise
+
+    def limit_otp_challenge(self, client_key: str, challenge_id: str, policy: str) -> None:
+        """Bound OTP verification across challenges from one client and for one specific challenge."""
+        challenge_key = "challenge:" + hashlib.sha256(normalise_key(challenge_id).encode("utf-8")).hexdigest()
+        for key in (client_key, challenge_key):
+            try:
+                self._limiter.enforce(policy, key)
+            except RateLimitExceeded:
+                self._audit("rate_limit.exceeded", AuditOutcome.DENIED,
+                            error_code=ErrorCode.RATE_LIMITED.value, metadata={"policy": policy})
+                raise
 
     def revoke_subject(self, actor: Optional[Principal], subject_id: str) -> None:
         """Invalidate every token of `subject_id` (role change, suspension, suspected theft). Needs
@@ -99,6 +154,15 @@ class SecurityService:
         principal = self._tokens.authenticate(token)
         self._tokens.revoke(token)
         self._audit("auth.token_revoked", AuditOutcome.SUCCESS, actor_id=principal.subject_id)
+
+    def record_access(self, event_type: str, subject_id: str) -> None:
+        """Audit a protected metadata disclosure before releasing it (same fail-closed policy)."""
+        self._audit(event_type, AuditOutcome.SUCCESS, strict=True, actor_id=subject_id)
+
+    def record_denial(self, event_type: str, subject_id: str) -> None:
+        """A denial remains effective even when its audit write fails; failures are counted/logged."""
+        self._audit(event_type, AuditOutcome.DENIED, actor_id=subject_id,
+                    error_code=ErrorCode.PERMISSION_DENIED.value)
 
     # ------------------------------------------------------------------ internals
     def _audit(self, event_type: str, outcome: AuditOutcome, strict: bool = False, **fields) -> None:

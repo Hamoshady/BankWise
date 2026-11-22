@@ -7,8 +7,8 @@ the processor is never called.
 
 What it does NOT do:
 * It does not read files: callers pass image BYTES. There is no path parameter, so no path can be injected.
-* It is not an entry point. There is no API, login or user store; whoever builds those calls this with the
-  Authorization header they received.
+* It is not an entry point. The API calls this with the received Authorization header;
+  database/login responsibilities remain outside the OCR service.
 * The OCR result is NOT proof that the card is genuine or that the holder is the person presenting it.
 * It cannot time out or kill a stuck OCR run, and it validates image headers, not pixel data.
 
@@ -23,7 +23,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Protocol
+from typing import Any, Callable, Dict, Mapping, Optional, Protocol, Tuple
 
 from bankwise.core.audit import AuditEvent, AuditOutcome, AuditSink
 from bankwise.core.bootstrap import build_security
@@ -68,6 +68,17 @@ class ProcessingResult:
     notice: str = NOTICE
 
 
+class ProcessingObserver(Protocol):
+    """Trusted application hooks, never client-supplied; no raw output is passed to persistence.
+
+    started runs after the single security gate and may reject/replay a reserved attempt.
+    succeeded runs only after the existing strict processing audit has completed.
+    """
+    def started(self, principal: Principal, request_id: str) -> None: ...
+    def succeeded(self, summary: Mapping[str, Any]) -> None: ...
+    def failed(self, error: Exception) -> None: ...
+
+
 def _type_name(error: BaseException) -> str:
     name = type(error).__name__
     return name if _TYPE_NAME_RE.match(name) else "Exception"
@@ -87,10 +98,66 @@ class IdentityProcessingService:
                 request_id: Optional[str] = None) -> ProcessingResult:
         """`request_id` (or the id of an enclosing `correlation_scope`) identifies the request in logs and audit
         records; an untrusted value is replaced by a fresh random one."""
+        return self.process_upload(authorization_header, client_key, lambda: (front_image, back_image), request_id)
+
+    def process_upload(self, authorization_header: Optional[str], client_key: str,
+                       load_images: Callable[[], Tuple[object, object]], request_id: Optional[str] = None,
+                       observer: Optional[ProcessingObserver] = None) -> ProcessingResult:
+        """Authenticate/authorize once before multipart parsing and OCR; preserve process() callers."""
         with correlation_scope(request_id or get_correlation_id()) as cid:
             principal = self._security.guard(authorization_header, PROCESS_PERMISSION, client_key,
                                              rate_policy=self._settings.rate_policy)
-            return self._run(principal, cid, front_image, back_image)
+            if observer is not None:
+                observer.started(principal, cid)
+            try:
+                try:
+                    front, back = load_images()
+                except BankWiseError as error:
+                    self._audit_failure(principal, error.code, {"stage": "upload"})
+                    raise
+                result = self._run(principal, cid, front, back)
+                if observer is not None:
+                    observer.succeeded(result.summary)
+                return result
+            except Exception as error:
+                if observer is not None:
+                    observer.failed(error)
+                raise
+
+    def extract_own_upload(self, authorization_header, client_key, load_images):
+        """Disclose only this caller's current upload; no stored-result IDs or reviewer access.
+
+        Raw fields are released after both processing authorization and a strict
+        disclosure audit. Images/fields are not persisted by this path.
+        """
+        principal = self._security.guard(authorization_header, 'identity:read_own_upload', client_key)
+        result = self.process_upload(authorization_header, client_key, load_images)
+        self._security.record_access('identity.own_upload_disclosed', principal.subject_id)
+        return self._extracted_fields(result)
+
+    def extract_application_upload(self, application_id, load_images):
+        """Internal use only: caller must authenticate a short-lived onboarding session and rate-limit it."""
+        front, back = load_images()
+        principal = Principal(str(application_id), frozenset())
+        result = self._run(principal, str(application_id), front, back)
+        self._security.record_access("onboarding.ocr_disclosed", str(application_id))
+        return self._extracted_fields(result)
+
+    @staticmethod
+    def _extracted_fields(result):
+        raw = result.sensitive.reveal()
+        names = ('first_name', 'other_names', 'address_line1', 'address_line2',
+                 'national_id', 'birth_date', 'gender', 'job', 'religion',
+                 'marital_status', 'issue_date', 'expiry_date')
+        fields = {name: raw.get(name) if isinstance(raw.get(name), str) else None for name in names}
+        validation = raw.get('validation', {})
+        identity = validation.get('national_id', {}) if isinstance(validation, dict) else {}
+        decoded = identity.get('decoded') or {}
+        derived = {}
+        if identity.get('status') == 'valid_structure' and isinstance(decoded, dict) and isinstance(decoded.get('birth_date'), str):
+            derived['birth_date_from_national_id'] = decoded['birth_date']
+        return {'request_id': result.request_id, 'fields': fields, 'derived': derived,
+                'summary': result.summary, 'notice': NOTICE}
 
     # ------------------------------------------------------------------ steps after the gates
     def _run(self, principal: Principal, request_id: str, front: object, back: object) -> ProcessingResult:

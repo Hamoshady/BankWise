@@ -1,0 +1,14 @@
+[
+ {"query":"محتاج أنهي التعامل على الحساب نهائيًا","source":"account_closure"},
+ {"query":"إزاي أبدأ أتعامل مع البنك بحساب جديد؟","source":"account_opening"},
+ {"query":"ما الإجراءات المطلوبة للحصول على تمويل؟","source":"loans"},
+ {"query":"إزاي أرسل مبلغ لشخص تاني؟","source":"transfers"},
+ {"query":"عايز أشوف المبالغ اللي خرجت من الحساب","source":"withdrawals"},
+ {"query":"محتاج أراجع الفلوس اللي دخلت الحساب","source":"deposits"},
+ {"query":"إزاي أفهم أنا بصرف فلوسي على إيه؟","source":"expense_analysis"},
+ {"query":"محتاج مستند فيه حركة الحساب خلال فترة","source":"account_statement"},
+ {"query":"أعمل إيه لو عندي وجع في بطني؟","source":null},
+ {"query":"ما هي عاصمة فرنسا؟","source":null},
+ {"query":"احجز لي تذكرة طيران إلى باريس","source":null},
+ {"query":"اكتب قصيدة عن البحر","source":null}
+]

@@ -1,0 +1,10 @@
+FROM bankwise-ai:rag-local
+USER root
+COPY requirements.txt requirements-semantic.txt /tmp/
+RUN python -m pip install --no-cache-dir -r /tmp/requirements.txt -r /tmp/requirements-semantic.txt
+RUN rm -rf /app/src/bankwise/api/web /app/src/bankwise/api/routers/ui.py
+COPY src/ /app/src/
+COPY configs/ /app/configs/
+COPY pyproject.toml requirements.txt /app/
+RUN python -m pip install --no-deps --no-build-isolation /app
+USER bankwise

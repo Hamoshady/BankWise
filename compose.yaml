@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bankwise}
+      POSTGRES_DB: ${POSTGRES_DB:-bankwise}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a URL-safe random POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    environment:
+      BANKWISE_ENV: ${BANKWISE_ENV:-production}
+      BANKWISE_JWT_SECRET: ${BANKWISE_JWT_SECRET:?Set BANKWISE_JWT_SECRET}
+      BANKWISE_AUDIT_HMAC_KEY: ${BANKWISE_AUDIT_HMAC_KEY:?Set BANKWISE_AUDIT_HMAC_KEY}
+      BANKWISE_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bankwise}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-bankwise}
+      BANKWISE_DATABASE_RETENTION_DAYS: ${BANKWISE_DATABASE_RETENTION_DAYS:-30}
+      BANKWISE_OCR_USE_GPU: "0"
+      BANKWISE_BANKING_MODE: ${BANKWISE_BANKING_MODE:-disabled}
+    volumes:
+      - ./configs:/app/configs:ro
+      - ${BANKWISE_DOCKER_MODEL_DIR:-./models}:/models:ro
+      - private_outputs:/app/outputs
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  private_outputs:

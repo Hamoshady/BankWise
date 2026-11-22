@@ -1,0 +1,254 @@
+{
+  "engine": "yolo_digits",
+  "strategy": "original",
+  "crop_padding": 0.0,
+  "crop_sha256": "11476c658591904913f80f0287cfa2f24420f124ee0bfa3672feb9dd01110a54",
+  "repeats": 3,
+  "cpu_threads": 4,
+  "opencv": "5.1.0",
+  "init_seconds": 0.08278439199989407,
+  "numeric_metrics": {
+    "count": 6,
+    "exact_match": 0.16666666666666666,
+    "cer": 0.15476190476190477,
+    "invalid_length_rate": 0.6666666666666666,
+    "missing_digit_rate": 0.8333333333333334,
+    "extra_digit_rate": 0.16666666666666666,
+    "substitutions_per_gt_digit": 0.0,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 1.0
+  },
+  "dev_metrics": {
+    "count": 4,
+    "exact_match": 0.25,
+    "cer": 0.16071428571428573,
+    "invalid_length_rate": 0.75,
+    "missing_digit_rate": 0.75,
+    "extra_digit_rate": 0.0,
+    "substitutions_per_gt_digit": 0.0,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 1.0
+  },
+  "reserved_diagnostic_metrics": {
+    "count": 2,
+    "exact_match": 0.0,
+    "cer": 0.14285714285714285,
+    "invalid_length_rate": 0.5,
+    "missing_digit_rate": 1.0,
+    "extra_digit_rate": 0.5,
+    "substitutions_per_gt_digit": 0.0,
+    "incorrect_but_accepted_rate": 0.0,
+    "manual_review_rate": 1.0
+  },
+  "recognition_mean_seconds": 0.013319194555568478,
+  "recognition_p95_seconds": 0.018328740050014856,
+  "recognition_peak_ram_mb": 343.87890625,
+  "pipeline_extra_init_seconds": 2.1004640749999908,
+  "pair_mean_seconds": 0.9819120316667017,
+  "pair_p95_seconds": 1.1551413244000286,
+  "pipeline_peak_ram_mb": 757.55859375,
+  "pipeline_metrics": {
+    "count": 3,
+    "exact_match": 0.3333333333333333,
+    "missing_or_conflicting_rate": 0.6666666666666666,
+    "manual_review_rate": 1.0,
+    "incorrect_but_accepted_rate": 0.0
+  },
+  "diagnostics": [
+    {
+      "sample": "A.front",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        123,
+        912,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 1,
+        "extra": 1
+      },
+      "confidence": 0.27922889590263367,
+      "flags": [
+        "overlapping_digits",
+        "invalid_structure"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "A.back",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        118,
+        560,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 12,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 2,
+        "extra": 0
+      },
+      "confidence": 0.32614389061927795,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "B.front",
+      "alignment": "rectified",
+      "crop_shape": [
+        102,
+        777,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 10,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 4,
+        "extra": 0
+      },
+      "confidence": 0.20626504719257355,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "B.back",
+      "alignment": "rectified",
+      "crop_shape": [
+        84,
+        398,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 11,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 3,
+        "extra": 0
+      },
+      "confidence": 0.2274726927280426,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "C.front",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        123,
+        912,
+        3
+      ],
+      "exact_match": false,
+      "raw_length": 12,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 2,
+        "extra": 0
+      },
+      "confidence": 0.4349120557308197,
+      "flags": [
+        "length_not_14"
+      ],
+      "reversed_sequence": false
+    },
+    {
+      "sample": "C.back",
+      "alignment": "already_aligned",
+      "crop_shape": [
+        122,
+        560,
+        3
+      ],
+      "exact_match": true,
+      "raw_length": 14,
+      "edit_counts": {
+        "substitutions": 0,
+        "missing": 0,
+        "extra": 0
+      },
+      "confidence": 0.25233766436576843,
+      "flags": [],
+      "reversed_sequence": false
+    }
+  ],
+  "pair_diagnostics": [
+    {
+      "sample": "A",
+      "exact_match": false,
+      "status": "invalid",
+      "manual_review": true,
+      "sides": {
+        "front": {
+          "status": "invalid",
+          "flags": [
+            "overlapping_digits",
+            "invalid_structure",
+            "experimental_numeric_backend"
+          ]
+        },
+        "back": {
+          "status": "invalid",
+          "flags": [
+            "length_not_14",
+            "experimental_numeric_backend"
+          ]
+        }
+      }
+    },
+    {
+      "sample": "B",
+      "exact_match": false,
+      "status": "invalid",
+      "manual_review": true,
+      "sides": {
+        "front": {
+          "status": "invalid",
+          "flags": [
+            "length_not_14",
+            "experimental_numeric_backend"
+          ]
+        },
+        "back": {
+          "status": "invalid",
+          "flags": [
+            "length_not_14",
+            "experimental_numeric_backend"
+          ]
+        }
+      }
+    },
+    {
+      "sample": "C",
+      "exact_match": true,
+      "status": "low_confidence",
+      "manual_review": true,
+      "sides": {
+        "front": {
+          "status": "invalid",
+          "flags": [
+            "length_not_14",
+            "experimental_numeric_backend"
+          ]
+        },
+        "back": {
+          "status": "low_confidence",
+          "flags": [
+            "experimental_numeric_backend"
+          ]
+        }
+      }
+    }
+  ],
+  "model_bytes": 5433306,
+  "limitation": "Only two real identities, previously seen in earlier diagnostics; no independent final real test set."
+}

@@ -1,0 +1,53 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /usr/local/bin/python
+rootdir: /work
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 29 items
+
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_fee] FAILED [  3%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_age] FAILED [  6%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[closing_fee] FAILED [ 10%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[closing_loan] PASSED [ 13%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[statement_period] PASSED [ 17%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[statement_formats] FAILED [ 20%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[withdrawals_count] 
+
+=================================== FAILURES ===================================
+____________________ test_arabic_policy_answer[opening_fee] ____________________
+tests/integration/test_rag_policy_acceptance.py:40: in test_arabic_policy_answer
+    assert expected in answer.answer, answer.answer
+E   AssertionError: يمكن إلغاء طلب فتح الحساب قبل تفعيله دون رسوم. [1]
+E   assert '0 جنيه' in 'يمكن إلغاء طلب فتح الحساب قبل تفعيله دون رسوم. [1]'
+E    +  where 'يمكن إلغاء طلب فتح الحساب قبل تفعيله دون رسوم. [1]' = RAGAnswer(answer='يمكن إلغاء طلب فتح الحساب قبل تفعيله دون رسوم. [1]', citations=(Citation(source='account_opening', chunk_id='e72dfb9723b1da01ff87a3dfe97c28086754ff54bf0f6c2301a4eace5bd6dd68', score=0.8409675773273306, excerpt='# فتح حساب\n\nحالة السياسة: قواعد محاكاة لبنك افتراضي في مشروع تخرج، وليست سياسة بنك حقيقي أو متطلبات قانونية.\nالإصدار: 1.0. تاريخ إصدار المحاكاة: 2026-11-02.\n\n## قواعد الخدمة الافتراضية\nفتح الحساب في البنك الافتراضي متاح للأفراد من عمر 21 سنة فأكثر، بالجنيه المصري فقط، بنوع حساب جاري أو حساب توفير.\n\nالمستندات المطلوبة لفتح الحساب هي بطاقة رقم قومي سارية وإثبات عنوان ورقم هاتف يخص مقدم الطلب. التحقق من المستندات ومراجعة الطلب مطلوبان قبل التفعيل؛ قراءة البطاقة بالـOCR وحدها لا تثبت ملكية الهوية.\n\nرسوم فتح الحساب 0 جنيه مصري. الحد الأدنى للإيداع عند فتح الحساب 100 جنيه مصري، ويضاف إلى رصيد العميل وليس رسومًا.\n\nرسوم الصيانة الشهرية للحساب 0 جنيه مصري. حساب التوفير في النسخة الافتراضية لا يمنح عائدًا على الرصيد.\n\nمدة مراجعة طلب فتح الحساب يومان عمل بعد اكتمال المستندات. نقص المستندات يوقف احتساب المدة حتى استكمالها.\n\nيمكن إلغاء طلب فتح الحساب قبل تفعيله دون رسوم. رفع البطاقة أو السؤال عن فتح الحساب لا ينشئ حسابًا فعليًا.\n\n## حدود الاستخدام الحالي\nالاستفسار المحلي عن السياسات لا يحتاج تسجيل'),)).answer
+---------------------------- Captured stderr setup -----------------------------
+`torch_dtype` is deprecated! Use `dtype` instead!
+----------------------------- Captured stderr call -----------------------------
+The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+------------------------------ Captured log call -------------------------------
+WARNING  transformers.generation.configuration_utils:logging.py:328 The following generation flags are not valid and may be ignored: ['temperature', 'top_p', 'top_k']. Set `TRANSFORMERS_VERBOSITY=info` for more details.
+____________________ test_arabic_policy_answer[opening_age] ____________________
+tests/integration/test_rag_policy_acceptance.py:38: in test_arabic_policy_answer
+    assert case['source'] in [c.source for c in answer.citations], answer.answer
+E   AssertionError: لم أجد في السياسات المتاحة دليلًا كافيًا للإجابة عن هذا السؤال.
+E   assert 'account_opening' in []
+____________________ test_arabic_policy_answer[closing_fee] ____________________
+tests/integration/test_rag_policy_acceptance.py:38: in test_arabic_policy_answer
+    assert case['source'] in [c.source for c in answer.citations], answer.answer
+E   AssertionError: لم أجد في السياسات المتاحة دليلًا كافيًا للإجابة عن هذا السؤال.
+E   assert 'account_closure' in []
+_________________ test_arabic_policy_answer[statement_formats] _________________
+tests/integration/test_rag_policy_acceptance.py:40: in test_arabic_policy_answer
+    assert expected in answer.answer, answer.answer
+E   AssertionError: يُعد كشف الحساب عند الطلب من السجلات المتاحة دون مدة تسليم مضمونة. [1]
+E   assert 'PDF' in 'يُعد كشف الحساب عند الطلب من السجلات المتاحة دون مدة تسليم مضمونة. [1]'
+E    +  where 'يُعد كشف الحساب عند الطلب من السجلات المتاحة دون مدة تسليم مضمونة. [1]' = RAGAnswer(answer='يُعد كشف الحساب عند الطلب من السجلات المتاحة دون مدة تسليم مضمونة. [1]', citations=(Citation(source='account_statement', chunk_id='75164afcfea99c46358ba4bc28b24906ce9619562a44a7643da8a4af56dd8222', score=0.8637387988002525, excerpt='# كشف حساب\n\nحالة السياسة: قواعد محاكاة لبنك افتراضي في مشروع تخرج، وليست سياسة بنك حقيقي أو متطلبات قانونية.\nالإصدار: 1.0. تاريخ إصدار المحاكاة: 2026-11-02.\n\n## قواعد الخدمة الافتراضية\nكشف الحساب في البنك الافتراضي يعرض حركات الحساب والرصيد الافتتاحي والرصيد الختامي بالجنيه المصري خلال الفترة المطلوبة.\n\nالفترة الافتراضية لكشف الحساب آخر 30 يومًا. يمكن طلب فترة حتى 12 شهرًا سابقة، بشرط ألا تبدأ قبل تاريخ فتح الحساب.\n\nكشف الحساب متاح بصيغتي PDF وCSV للتنزيل داخل الجلسة المصرح بها. رسوم كشف الحساب الإلكتروني 0 جنيه مصري. لا تتضمن النسخة الافتراضية كشفًا ورقيًا مختومًا أو إرسالًا بالبريد الإلكتروني.\n\nيُعد كشف الحساب عند الطلب من السجلات المتاحة دون مدة تسليم مضمونة. عند عدم توفر السجلات، تظهر رسالة عدم توفر البيانات ولا ينشأ كشف تخميني.\n\nلا يعرض كشف الحساب إلا لصاحب الحساب بعد تسجيل الدخول والتحقق من الصلاحيات. RAG يشرح سياسة كشف الحساب ولا يستطيع قراءة رصيدك أو إنشاء كشف معاملات حقيقي.\n\n## حدود الاستخدام الحالي\nالاستفسار المحلي عن السياسات لا يحتاج تسجيل دخول. الوصول إلى بيانات عميل أو'),)).answer
+=========================== short test summary info ============================
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_fee]
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_age]
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[closing_fee]
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[statement_formats]
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/usr/local/lib/python3.11/site-packages/torch/nn/modules/linear.py:134: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+========================= 4 failed, 2 passed in 39.76s =========================

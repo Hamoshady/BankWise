@@ -1,0 +1,20 @@
+[
+ {"query":"عايز اقفل حسابي","source":"account_closure"},
+ {"query":"شروط إغلاق الحِساب","source":"account_closure"},
+ {"query":"عاوز افتح حساب","source":"account_opening"},
+ {"query":"متطلبات فتح حساب","source":"account_opening"},
+ {"query":"عايز قرض","source":"loans"},
+ {"query":"شروط التمويل","source":"loans"},
+ {"query":"عاوز ابعت فلوس","source":"transfers"},
+ {"query":"رسوم تحويل الاموال","source":"transfers"},
+ {"query":"اخر عمليات سحبت","source":"withdrawals"},
+ {"query":"عمليات السحب","source":"withdrawals"},
+ {"query":"اخر عمليات اودعت","source":"deposits"},
+ {"query":"عمليات الإيداع","source":"deposits"},
+ {"query":"حلل المصاريف","source":"expense_analysis"},
+ {"query":"تحليل المصروفات","source":"expense_analysis"},
+ {"query":"عاوز كشف حساب","source":"account_statement"},
+ {"query":"كشف حسابي","source":"account_statement"},
+ {"query":"علاج الصداع","source":null},
+ {"query":"حالة الطقس غدا","source":null}
+]

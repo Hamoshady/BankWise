@@ -1,23 +1,21 @@
 # Security integration guide
 
-What the security foundation provides, and exactly where later phases must connect it. Nothing below is wired
-into an execution path yet; "ready" means a tested library exists, not that anything calls it.
+The security foundation is now connected to the REST API and the local OCR adapter.
+The standalone OCR CLI retains its existing behavior. See [api_contract.md](api_contract.md)
+and [backend_setup.md](backend_setup.md) for the implemented entry point and deployment.
 
 ## Status
 
-| Component | Library status | Connected to a real path? | Connect it when... |
-|---|---|---|---|
-| Config + secrets | ready | no | the app starts (`load_app_config`, `get_secret`) |
-| PII redaction | ready | no (the OCR CLI has its own redaction) | replacing the CLI's masking and in every log/diagnostic path |
-| Logging + correlation id | ready | no | the app starts (`configure_logging`), once per request (`correlation_scope`) |
-| Audit events | ready; durable hash-chained file sink | no | an entry point calls `build_security()`; database-backed sink later |
-| RBAC | ready | no | an API route or service method needs a permission |
-| Token authentication | ready | no | there is a login handler and an API |
-| Password hashing | ready | no | there is a user store |
-| Rate limiting | ready (in-memory only) | no | an API exists; use a shared backend if multi-process |
-| Identity processing service (`integration/identity_processing.py`) | ready, tested with a **simulated** OCR processor | no: needs an adapter for `IdOcrPipeline` and an entry point | the OCR adapter and the API/worker exist |
-| Sensitive uploads | ready | no | the API receives images |
-| Safe output files | ready | **no: the OCR CLI `--out` still writes directly** | the CLI is updated (snippet below) |
+| Component | API integration |
+|---|---|
+| Config, secrets, logging | Application lifespan calls build_security once; redaction enabled |
+| JWT authentication and passwords | Login verifies database credentials with existing Argon2 helpers; shared SecurityService issues/verifies tokens |
+| RBAC, lockout and rate limits | Existing guard owns processing authorization; GET adds read permission and owner filtering |
+| Audit events | Existing durable file sink retained; processing/read/replay/token grants fail closed |
+| Identity processing | Existing service and local IdOcrAdapter; synchronous, no serving-time downloads |
+| Database | PostgreSQL, SQLAlchemy sessions and Alembic; users, role associations, minimal identity metadata |
+| Uploads | Bounded multipart parsed in memory; no temporary-file spooling or raw-image persistence |
+| CLI output files | Existing OCR CLI output behavior unchanged; not covered by the API |
 
 ## Composition root (tested)
 
@@ -41,8 +39,8 @@ for note in runtime.warnings:                    # development notes; empty in a
 
 ## Identity processing (OCR behind the security layer)
 
-`IdentityProcessingService.process(authorization_header, client_key, front_bytes, back_bytes, request_id=None)` is the only
-intended way to run OCR for a caller. OCR runs only after, in this order: authentication -> per-client lockout ->
+`IdentityProcessingService.process(authorization_header, client_key, front_bytes, back_bytes, request_id=None)` and
+its API-facing `process_upload` method are the intended paths for caller OCR. Both use: per-client lockout -> authentication ->
 per-user rate limit (`identity_process`) -> authorization (`identity:process`) -> header-level image validation
 (JPEG/PNG only, `max_image_bytes`, `max_pixels`, `min_side_pixels`) -> a concurrency slot (`max_concurrent`). A failure
 at any step stops there and the processor is not called. Rejected requests still spend the user's rate-limit budget.
@@ -84,9 +82,9 @@ result = service.process(authorization_header, "ip:203.0.113.7", front_bytes, ba
 ```
 
 * **Not provided:** an OCR timeout (a hung run keeps its slot), decoding-level image hardening (only headers are checked),
-  persistence of results, and any claim that a card is genuine or that its holder is the person presenting it.
+  persistence of raw results, and any claim that a card is genuine or that its holder is the person presenting it.
 
-### The user-verification interface to add later (not implemented, no default users exist)
+### Credential verification interface (implemented by database/accounts.py; no default users exist)
 
 ```python
 class CredentialVerifier(Protocol):
@@ -97,7 +95,7 @@ class CredentialVerifier(Protocol):
 A login handler built on it must: verify with `verify_password_or_dummy(stored_hash_or_None, password)`; rate-limit
 with the `auth_attempt` policy per client **and** per (normalised) username; load the roles from the user store at login time
 (so a role change plus `revoke_subject` takes effect); return the token from `security.issue_token(principal)`; never
-log the password or the token. Its user table, password reset and account management are separate work.
+log the password or the token. The user table and operator provisioning CLI now exist. Password reset and remote account management remain separate work.
 
 ### Running the real-OCR integration test (opt-in, on your machine)
 
@@ -114,26 +112,21 @@ unless `RUN_REAL_OCR=1` and easyocr/id_ocr are importable.
 
 ## Integration points by phase
 
-**API (future).** One dependency/middleware per request:
-1. `with correlation_scope(request_id_header):` (untrusted ids are replaced, so no log injection).
-2. `principal = security.guard(request.headers.get("Authorization"), "identity:submit", client_key, rate_policy="identity_submit")`.
-   `client_key` such as `ip:<address>`: do not take it from `X-Forwarded-For` unless a trusted proxy sets it.
-3. Map errors with `to_public_error(exc)`; return 401 for `authentication_failed`, 403 for `permission_denied`,
-   429 for `rate_limited` (use `retry_after_seconds`), 422/400 for `validation_failed`, 500 for everything else.
-   Never return `exc.detail`, a traceback or the token.
-4. Add the transport hardening the library cannot provide: TLS, CORS allow-list, security headers, body size limit.
+**API (implemented).** `api/main.py:create_app` owns the shared lifespan. Dependencies resolve
+that runtime and request-scoped sessions. The identity service owns the processing gate; a
+trusted observer reserves/persists metadata without receiving raw OCR. Bounded transport
+handling, explicit DTOs and sanitized exceptions are described in [api_contract.md](api_contract.md).
 
-**Login (future, needs a user store).**
-`stored = users.get_hash(username)` (or `None`) -> `ok = verify_password_or_dummy(stored, password)` ->
-if ok: `security.issue_token(Principal(user_id, roles))`; if `password_needs_rehash(stored)` store a new hash.
-Rate-limit the endpoint with the `auth_attempt` policy keyed by client. Logout: `security.revoke(header)`.
-Roles come from the user store at login time.
+**Login (implemented).** `SecurityService.login` applies client and normalized-account budgets
+before `Accounts.verify` uses the real/dummy password verifier and loads persisted roles.
+Token issuance is audited and fail-closed. Active account and exact role-set checks supplement
+token validation. Local provisioning is documented in [backend_setup.md](backend_setup.md).
 
-**Database (future).** (a) a database-backed `AuditSink` (append-only table, write-only credentials) if the file sink is not enough; (b) a persistent `RevocationStore` (same two methods);
+**Shared security storage (future, beyond current metadata persistence).** (a) a database-backed `AuditSink` (append-only table, write-only credentials) if the file sink is not enough; (b) a persistent `RevocationStore` (the existing four-method protocol);
 (c) a shared `RateLimiterBackend`; (d) store only `fingerprint`-style references, never raw national IDs, where a
 lookup key is needed (an HMAC with `pii_hmac_key` is the planned primitive; it is not implemented yet).
 
-**Sensitive uploads (future API).** `file_id = store.save(image_bytes)`; pass the opaque id between steps; call
+**Optional future persisted uploads (not used by this API).** `file_id = store.save(image_bytes)`; pass the opaque id between steps; call
 `store.delete(file_id)` as soon as processing ends; call `store.purge_expired()` at start-up and on a timer. Decode
 and size-limit the image in the vision step before OCR.
 

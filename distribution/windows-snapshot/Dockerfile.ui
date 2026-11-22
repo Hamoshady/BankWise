@@ -1,0 +1,2 @@
+FROM bankwise-ai:streamlit
+COPY ui/ /app/ui/

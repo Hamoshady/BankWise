@@ -1,0 +1,29 @@
+{
+  "old": {
+    "backend": "current",
+    "correct": 18,
+    "total": 24,
+    "median_seconds": 10.116,
+    "mean_seconds": 10.392083333333334
+  },
+  "new": {
+    "backend": "llama",
+    "correct": 24,
+    "total": 24,
+    "median_seconds": 2.6595,
+    "mean_seconds": 2.6375
+  },
+  "checks": {
+    "accuracy": true,
+    "improvement": true,
+    "safety_cases": true,
+    "latency": true
+  },
+  "routing_gate_passed": true,
+  "median_speedup": 3.8,
+  "additional_adoption_requirements": [
+    "CIB policy regression",
+    "API authorization and OTP regression",
+    "Streamlit live interaction"
+  ]
+}

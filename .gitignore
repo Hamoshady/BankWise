@@ -11,6 +11,9 @@ __pycache__/
 .pytest_cache/
 .EasyOCR/
 models/
+# ORM source code is not a directory of downloaded OCR weights.
+!src/bankwise/database/models/
+!src/bankwise/database/models/*.py
 
 # Virtual environments and secrets
 .venv/

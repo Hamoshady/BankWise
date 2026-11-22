@@ -1,0 +1,26 @@
+[
+  {
+    "phase": "first",
+    "embedding_seconds": 0.4502540610046708,
+    "embedding_texts": 15,
+    "llm_seconds": 4.182105230000161,
+    "llm_calls": 1,
+    "total_seconds": 4.635797745999298,
+    "answer": "الحد الأقصى للخصم اليومي لحساب بداية للتوفير من CIB هو 90000 جنيه. [1]",
+    "sources": [
+      "bedaya"
+    ]
+  },
+  {
+    "phase": "repeat",
+    "embedding_seconds": 0.11634140599926468,
+    "embedding_texts": 10,
+    "llm_seconds": 1.395773668999027,
+    "llm_calls": 1,
+    "total_seconds": 1.5140146869998716,
+    "answer": "الحد الأقصى للخصم اليومي لحساب بداية للتوفير من CIB هو 90000 جنيه. [1]",
+    "sources": [
+      "bedaya"
+    ]
+  }
+]

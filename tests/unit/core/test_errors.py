@@ -3,25 +3,32 @@ import json
 import pytest
 
 from bankwise.core.errors import (
-    AuthenticationError, BankWiseError, ConfigError, ErrorCode, InvalidInputError, PermissionDenied, RateLimitExceeded,
-    to_public_error,
+    AuthenticationError, BankWiseError, ConfigError, ErrorCode, InvalidInputError, OtpError, PermissionDenied,
+    RateLimitExceeded, to_public_error,
 )
 from core_test_data import FAKE_NID
 
-ALL = [BankWiseError, ConfigError, InvalidInputError, AuthenticationError, PermissionDenied, RateLimitExceeded]
+ALL = [BankWiseError, ConfigError, InvalidInputError, AuthenticationError, PermissionDenied, RateLimitExceeded, OtpError]
 
 
 def test_error_codes_are_stable_strings():
     assert {code.name: code.value for code in ErrorCode} == {
         "CONFIG_INVALID": "config_invalid", "VALIDATION_FAILED": "validation_failed",
-        "AUTHENTICATION_FAILED": "authentication_failed", "PERMISSION_DENIED": "permission_denied", "RATE_LIMITED": "rate_limited", "INTERNAL_ERROR": "internal_error",
+        "AUTHENTICATION_FAILED": "authentication_failed", "PERMISSION_DENIED": "permission_denied", "RATE_LIMITED": "rate_limited", "OTP_FAILED": "otp_failed", "INTERNAL_ERROR": "internal_error",
     }
     assert ConfigError.code is ErrorCode.CONFIG_INVALID
     assert InvalidInputError.code is ErrorCode.VALIDATION_FAILED
     assert AuthenticationError.code is ErrorCode.AUTHENTICATION_FAILED
     assert PermissionDenied.code is ErrorCode.PERMISSION_DENIED
     assert RateLimitExceeded.code is ErrorCode.RATE_LIMITED
+    assert OtpError.code is ErrorCode.OTP_FAILED
     assert BankWiseError.code is ErrorCode.INTERNAL_ERROR
+
+
+def test_otp_error_only_exposes_allowlisted_challenge_reasons():
+    assert OtpError("sensitive details", reason="012345 secret").to_public() == {
+        "code": "otp_failed", "message": "OTP verification failed.", "reason": "invalid_otp"}
+    assert OtpError(reason="exhausted").to_public()["reason"] == "exhausted"
 
 
 @pytest.mark.parametrize("cls", ALL)

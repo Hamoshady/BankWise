@@ -1,0 +1,9 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements-ui.txt .
+RUN pip install --no-cache-dir -r requirements-ui.txt && useradd --create-home appuser
+COPY ui/ /app/ui/
+USER appuser
+ENV BANKWISE_API_URL=http://127.0.0.1:8000
+EXPOSE 8501
+CMD ["streamlit", "run", "ui/app.py", "--server.address=127.0.0.1", "--server.port=8501", "--server.headless=true", "--browser.gatherUsageStats=false", "--server.maxUploadSize=5", "--theme.primaryColor=#087f72", "--theme.backgroundColor=#f5f7f9", "--theme.secondaryBackgroundColor=#ffffff", "--theme.textColor=#172e3c", "--theme.font=sans serif"]

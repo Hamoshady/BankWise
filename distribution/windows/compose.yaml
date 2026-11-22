@@ -1,0 +1,72 @@
+name: bankwise-share
+x-environment: &environment
+  BANKWISE_ENV: production
+  BANKWISE_JWT_SECRET: ${BANKWISE_JWT_SECRET:?Run Start.ps1}
+  BANKWISE_AUDIT_HMAC_KEY: ${BANKWISE_AUDIT_HMAC_KEY:?Run Start.ps1}
+  BANKWISE_REVIEW_KEY: ${BANKWISE_REVIEW_KEY:?Run Start.ps1}
+  BANKWISE_DATABASE_URL: postgresql+psycopg://bankwise:${POSTGRES_PASSWORD}@db:5432/bankwise
+  BANKWISE_BANKING_MODE: demo
+  BANKWISE_OCR_MODEL_DIR: /models
+  BANKWISE_OCR_USE_GPU: "0"
+  BANKWISE_OCR_ALLOW_CPU_FALLBACK: "0"
+services:
+  db:
+    image: postgres:16-alpine
+    pull_policy: never
+    environment:
+      POSTGRES_USER: bankwise
+      POSTGRES_DB: bankwise
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["db:/var/lib/postgresql/data"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U bankwise -d bankwise"]
+      interval: 5s
+      retries: 20
+    restart: unless-stopped
+  setup:
+    image: bankwise-share:api
+    pull_policy: never
+    environment:
+      <<: *environment
+      BANKWISE_INITIAL_ADMIN_PASSWORD: ${BANKWISE_INITIAL_ADMIN_PASSWORD}
+    volumes: ["outputs:/app/outputs", "./knowledge/cib:/policies:ro"]
+    command: [python, /opt/share/bootstrap.py]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: "no"
+  api:
+    image: bankwise-share:api
+    pull_policy: never
+    environment:
+      <<: *environment
+      BANKWISE_RAG_MODE: semantic
+      BANKWISE_RAG_MODEL_DIR: /rag-models
+      BANKWISE_LLAMA_URL: http://127.0.0.1:8081
+    volumes:
+      - outputs:/app/outputs
+      - ./models/ocr:/models:ro
+      - ./models/rag:/rag-models:ro
+      - ./models/llm:/llm-models:ro
+    command: [python, /opt/share/serve.py]
+    depends_on:
+      setup: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=3)"]
+      interval: 15s
+      start_period: 300s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+  ui:
+    image: bankwise-share:ui
+    pull_policy: never
+    environment:
+      BANKWISE_API_URL: http://api:8000
+    ports: ["127.0.0.1:${BANKWISE_UI_PORT:-8501}:8501"]
+    command: [streamlit, run, ui/app.py, --server.address=0.0.0.0, --server.port=8501, --server.headless=true, --browser.gatherUsageStats=false, --server.maxUploadSize=5]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+volumes:
+  db:
+  outputs:

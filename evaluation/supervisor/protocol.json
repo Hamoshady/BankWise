@@ -1,0 +1,11 @@
+{
+  "scope": "24 manually labelled banking requests, including one known in-prompt regression; not a general Arabic benchmark",
+  "comparison": "Deployed pipelines: Qwen2.5-1.5B FP32 Transformers vs Qwen3.5-4B Q4_K_M llama.cpp CPU. Same messages and tool validation, 4 CPU threads, no reasoning, deterministic decoding. llama.cpp additionally constrains JSON schema. Startup and one warmup excluded. Prefix reuse may benefit llama.cpp; speed difference is not attributable to model alone.",
+  "adoption": {
+    "minimum_correct": 22,
+    "must_exceed_baseline_correct": true,
+    "must_pass_safety_cases": ["fees", "negated_transfer", "negated_open", "hypothetical", "quoted", "injection", "out_of_scope"],
+    "maximum_median_latency_ratio": 2,
+    "additional_requirements": ["CIB policy regression", "API authorization and OTP regression", "Streamlit live interaction"]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "status": "adopted",
+  "verified_at": "2026-11-16T17:15:37.429562+00:00",
+  "model": "Qwen3.5-4B Q4_K_M",
+  "runtime": "llama.cpp b12359 CPU",
+  "model_sha256_verified": true,
+  "runtime_archive_sha256_verified": true,
+  "prompt_cache_budget_mib": 1024,
+  "backend_tests_passed": 707,
+  "ui_unit_tests_passed": 10,
+  "real_model_tests_passed": 4,
+  "live_streamlit_passed": true,
+  "cib_six_questions_passed": true,
+  "historical_grant_pdf_checkpoint_and_confirmation_smoke_passed": true,
+  "rollback_config": "~/.config/bankwise_ai/local-api.pre-qwen3.5.env",
+  "caveats": [
+    "Small development set, not general Arabic accuracy",
+    "Warm routing benchmark excludes startup; first uncached request is slower",
+    "Bedaya policy question was slower in the measured UI pass"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "archive_sha256": "5044c6ce18f229d38ddb9a6fec00d782d878c1406a61323577d242445e86da47",
+  "license_in_export": "MIT label in README.dataset.txt; no consent provenance supplied",
+  "pretrained_source": "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n.pt",
+  "pretrained_sha256": "0ebbc80d4a7680d14987a577cd21342b65ecfd94632bd9a8da63ae6417644ee1",
+  "image_annotations_non_box_rows": 101,
+  "non_box_row_lengths": {
+    "11": 83,
+    "13": 18
+  },
+  "out_of_bounds_rectangle_rows": 0,
+  "source_name_groups_shared_across_original_splits": 32
+}

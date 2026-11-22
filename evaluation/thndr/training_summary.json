@@ -1,0 +1,31 @@
+{
+  "epochs_requested": 25,
+  "backbone_layers_frozen": 10,
+  "device": "0",
+  "elapsed_seconds": 213.1715059679991,
+  "test_metrics": {
+    "metrics/precision(B)": 0.909544851362364,
+    "metrics/recall(B)": 0.8729285045882842,
+    "metrics/mAP50(B)": 0.9187122104882375,
+    "metrics/mAP50-95(B)": 0.47942033196463196,
+    "fitness": 0.47942033196463196
+  },
+  "classes": {
+    "0": "front.address_line1",
+    "1": "front.address_line2",
+    "2": "back.expiry_date",
+    "3": "front.first_name",
+    "4": "back.gender",
+    "5": "front.national_id",
+    "6": "back.issue_date",
+    "7": "back.job",
+    "8": "back.job_line2",
+    "9": "front.other_names",
+    "10": "back.religion",
+    "11": "front.serial",
+    "12": "back.marital_status",
+    "13": "back.husband_name"
+  },
+  "identity_split_verified": false,
+  "serving_default_changed": false
+}

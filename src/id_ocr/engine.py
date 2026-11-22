@@ -130,11 +130,12 @@ class OcrEngine:
         ih, iw = img.shape[:2]
         return [RawRead(text=t, conf=float(c), bbox=(0, 0, iw, ih)) for _, t, c in res if t and t.strip()]
 
-    def read_tokens(self, img: np.ndarray, reader_key: str = "ar", allowlist: Optional[str] = None) -> List[RawRead]:
+    def read_tokens(self, img: np.ndarray, reader_key: str = "ar", allowlist: Optional[str] = None, *, width_ths: Optional[float] = None) -> List[RawRead]:
         """Detection + recognition (use for rows with several words)."""
         rd = self.reader(reader_key)
+        options = {} if width_ths is None else {"width_ths": width_ths}
         res = self._timed(rd.readtext, img, allowlist=allowlist, detail=1, paragraph=False,
-                          decoder=self.cfg.decoder)
+                          decoder=self.cfg.decoder, **options)
         out: List[RawRead] = []
         for box, t, c in res:
             if not t or not t.strip():
@@ -142,6 +143,10 @@ class OcrEngine:
             xs, ys = [int(p[0]) for p in box], [int(p[1]) for p in box]
             out.append(RawRead(text=t, conf=float(c), bbox=(min(xs), min(ys), max(xs), max(ys))))
         return out
+
+    def read_layout(self, img: np.ndarray):
+        """Keep nearby words apart when locating printed field labels."""
+        return self.read_tokens(img, "ar", width_ths=0.05)
 
     # -------------------------------------------------------------- diagnostics
     def info(self) -> Dict[str, Any]:
@@ -211,8 +216,15 @@ _ENGINES_LOCK = threading.Lock()
 def get_engine(cfg: Optional[OcrConfig] = None) -> OcrEngine:
     """Process-wide engine cache so readers are loaded once and reused."""
     cfg = cfg or OcrConfig()
-    key = (cfg.use_gpu, cfg.allow_cpu_fallback, cfg.model_dir, cfg.download_models, cfg.decoder)
+    if cfg.backend not in ('easyocr', 'paddle'):
+        raise EngineError('invalid_backend', 'OCR backend must be easyocr or paddle.')
+    key = (cfg.backend, cfg.use_gpu, cfg.allow_cpu_fallback, cfg.model_dir, cfg.download_models, cfg.decoder,
+           cfg.paddle_model_dir, cfg.cpu_threads)
     with _ENGINES_LOCK:
         if key not in _ENGINES:
-            _ENGINES[key] = OcrEngine(cfg)
+            if cfg.backend == 'paddle':
+                from .paddle_engine import PaddleEngine
+                _ENGINES[key] = PaddleEngine(cfg)
+            else:
+                _ENGINES[key] = OcrEngine(cfg)
         return _ENGINES[key]

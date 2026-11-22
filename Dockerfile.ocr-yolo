@@ -1,0 +1,4 @@
+FROM bankwise-ai:ocr-benchmark
+USER root
+RUN python -m pip install --no-cache-dir ultralytics==8.3.228
+USER bankwise

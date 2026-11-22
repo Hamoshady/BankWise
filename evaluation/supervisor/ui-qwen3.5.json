@@ -1,0 +1,30 @@
+{
+  "queries": [
+    {
+      "prompt": "اعرض كشف حسابي",
+      "seconds": 2.462,
+      "tools": [
+        "get_statement"
+      ],
+      "model": "Qwen3.5-4B · Q4_K_M · llama.cpp"
+    },
+    {
+      "prompt": "ما الحد اليومي لحساب بداية؟",
+      "seconds": 21.312,
+      "tools": [
+        "search_knowledge_base"
+      ],
+      "model": "Qwen3.5-4B · Q4_K_M · llama.cpp"
+    },
+    {
+      "prompt": "عايز كشف حساب وشروط القرض",
+      "seconds": 19.197,
+      "tools": [
+        "get_statement",
+        "search_knowledge_base"
+      ],
+      "model": "Qwen3.5-4B · Q4_K_M · llama.cpp"
+    }
+  ],
+  "complete": true
+}

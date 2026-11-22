@@ -1,0 +1,13 @@
+{
+  "repository": "ggml-org/Qwen3.5-4B-GGUF",
+  "revision": "8d43d974efc48399cb58957ad49c8b26bf5a109c",
+  "file": "Qwen3.5-4B-Q4_K_M.gguf",
+  "bytes": 3032091584,
+  "sha256": "217002fa8008ef4fc6d548353a3aebef055a96e6ff8e0e2c0953ef8254a89c14",
+  "license": "Apache-2.0",
+  "runtime": "ggml-org/llama.cpp",
+  "runtime_release": "b12359",
+  "runtime_archive": "llama-b12359-bin-ubuntu-x64.tar.gz",
+  "runtime_archive_bytes": 23311084,
+  "runtime_archive_sha256": "0bc1f091e8916102b6d8f2cf944233a620e90a0f856c72d0ce41150c65c2e72e"
+}

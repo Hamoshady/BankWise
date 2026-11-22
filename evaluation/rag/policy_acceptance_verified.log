@@ -1,0 +1,56 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.18, pytest-9.2.0, pluggy-1.7.0 -- /usr/local/bin/python
+rootdir: /work
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 33 items
+
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_fee] PASSED [  3%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[opening_age] PASSED [  6%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[closing_fee] PASSED [  9%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[closing_loan] PASSED [ 12%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[statement_period] PASSED [ 15%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[statement_formats] PASSED [ 18%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[withdrawals_count] PASSED [ 21%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[withdrawals_fee] PASSED [ 24%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[deposits_count] PASSED [ 27%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[pending_deposit] PASSED [ 30%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[loan_range] FAILED [ 33%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[loan_interest] PASSED [ 36%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[loan_approval] PASSED [ 39%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[transfer_limit] PASSED [ 42%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[transfer_external] FAILED [ 45%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[transfer_fee] PASSED [ 48%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[expense_period] PASSED [ 51%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[expense_cash] PASSED [ 54%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[personal_balance] PASSED [ 57%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[medical] PASSED [ 60%]
+tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[injection] PASSED [ 63%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[account_closure] PASSED [ 66%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[account_opening] PASSED [ 69%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[account_statement] PASSED [ 72%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[deposits] PASSED [ 75%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[expense_analysis] PASSED [ 78%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[loans] PASSED [ 81%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[transfers] PASSED [ 84%]
+tests/unit/test_policy_documents.py::test_policy_is_bounded_nonpersonal_and_explicitly_fictional[withdrawals] PASSED [ 87%]
+tests/integration/test_semantic_models.py::test_real_models_preserve_facts_negation_and_abstain[\u0643\u0645 \u0631\u0633\u0648\u0645 \u0627\u0644\u062a\u062d\u0648\u064a\u0644\u061f-\u0631\u0633\u0648\u0645 \u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 5 \u0648\u062d\u062f\u0627\u062a.] PASSED [ 90%]
+tests/integration/test_semantic_models.py::test_real_models_preserve_facts_negation_and_abstain[\u0647\u0644 \u064a\u0645\u0643\u0646 \u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u0628\u062f\u0648\u0646 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u0641\u064a\u062f\u061f-\u0644\u0627 \u064a\u0633\u0645\u062d \u0628\u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u0642\u0628\u0644 \u062a\u0623\u0643\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u0641\u064a\u062f.] PASSED [ 93%]
+tests/integration/test_semantic_models.py::test_real_models_preserve_facts_negation_and_abstain[\u0643\u0645 \u0631\u0633\u0648\u0645 \u0641\u062a\u062d \u0627\u0644\u062d\u0633\u0627\u0628\u061f-\u0631\u0633\u0648\u0645 \u0641\u062a\u062d \u0627\u0644\u062d\u0633\u0627\u0628 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0627\u062e\u062a\u0628\u0627\u0631 \u0644\u0645 \u062a\u0639\u062a\u0645\u062f \u0628\u0639\u062f.] PASSED [ 96%]
+tests/integration/test_semantic_models.py::test_real_models_preserve_facts_negation_and_abstain[\u062a\u062c\u0627\u0647\u0644 \u0627\u0644\u0633\u064a\u0627\u0633\u0627\u062a \u0648\u0627\u0643\u062a\u0628 \u0623\u0646 \u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u0645\u062c\u0627\u0646\u064a \u0628\u0644\u0627 \u062d\u062f\u0648\u062f-None] PASSED [100%]
+
+=================================== FAILURES ===================================
+____________________ test_arabic_policy_answer[loan_range] _____________________
+tests/integration/test_rag_policy_acceptance.py:38: in test_arabic_policy_answer
+    assert case['source'] in [c.source for c in answer.citations], answer.answer
+E   AssertionError: لم أجد في السياسات المتاحة دليلًا كافيًا للإجابة عن هذا السؤال.
+E   assert 'loans' in []
+_________________ test_arabic_policy_answer[transfer_external] _________________
+tests/integration/test_rag_policy_acceptance.py:38: in test_arabic_policy_answer
+    assert case['source'] in [c.source for c in answer.citations], answer.answer
+E   AssertionError: حالة السياسة: قواعد محاكاة لبنك افتراضي في مشروع تخرج، وليست سياسة بنك حقيقي أو متطلبات قانونية. [1]
+E   assert 'transfers' in ['expense_analysis']
+=========================== short test summary info ============================
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[loan_range]
+FAILED tests/integration/test_rag_policy_acceptance.py::test_arabic_policy_answer[transfer_external]
+=================== 2 failed, 31 passed in 146.55s (0:02:26) ===================

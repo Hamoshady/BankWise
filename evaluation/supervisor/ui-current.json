@@ -1,0 +1,30 @@
+{
+  "queries": [
+    {
+      "prompt": "اعرض كشف حسابي",
+      "seconds": 10.216,
+      "tools": [
+        "get_statement"
+      ],
+      "model": null
+    },
+    {
+      "prompt": "ما الحد اليومي لحساب بداية؟",
+      "seconds": 16.76,
+      "tools": [
+        "search_knowledge_base"
+      ],
+      "model": null
+    },
+    {
+      "prompt": "عايز كشف حساب وشروط القرض",
+      "seconds": 22.286,
+      "tools": [
+        "get_statement",
+        "search_knowledge_base"
+      ],
+      "model": null
+    }
+  ],
+  "complete": true
+}

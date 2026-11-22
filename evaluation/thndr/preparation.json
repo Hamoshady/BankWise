@@ -1,0 +1,71 @@
+{
+  "source_images": 4363,
+  "source_name_groups": 840,
+  "perceptual_clusters": 812,
+  "split_counts": {
+    "train": 581,
+    "val": 144,
+    "test": 115
+  },
+  "class_counts": {
+    "train": {
+      "back.gender": 157,
+      "back.religion": 157,
+      "back.marital_status": 155,
+      "back.issue_date": 157,
+      "back.expiry_date": 155,
+      "back.job": 156,
+      "back.job_line2": 65,
+      "back.husband_name": 22,
+      "front.first_name": 430,
+      "front.other_names": 429,
+      "front.address_line1": 430,
+      "front.address_line2": 433,
+      "front.national_id": 432,
+      "front.serial": 431
+    },
+    "val": {
+      "back.issue_date": 30,
+      "back.expiry_date": 29,
+      "back.job": 31,
+      "back.gender": 30,
+      "back.religion": 31,
+      "back.marital_status": 30,
+      "front.first_name": 115,
+      "front.other_names": 116,
+      "front.address_line1": 114,
+      "front.address_line2": 115,
+      "front.national_id": 119,
+      "front.serial": 107,
+      "back.job_line2": 15,
+      "back.husband_name": 5
+    },
+    "test": {
+      "back.issue_date": 31,
+      "back.job": 30,
+      "back.gender": 31,
+      "back.religion": 31,
+      "back.marital_status": 31,
+      "back.expiry_date": 32,
+      "front.other_names": 84,
+      "front.address_line1": 84,
+      "front.address_line2": 83,
+      "front.national_id": 84,
+      "front.serial": 82,
+      "front.first_name": 84,
+      "back.job_line2": 14,
+      "back.husband_name": 7
+    }
+  },
+  "converted_polygons": 16,
+  "dropped_classes": [
+    "Front",
+    "Back"
+  ],
+  "identity_separation_verified": false,
+  "limitations": [
+    "Perceptual grouping does not prove different identities across splits.",
+    "Printed birth date and back national-ID are not labeled.",
+    "Export already stretched to 512x512; original aspect ratios unavailable."
+  ]
+}

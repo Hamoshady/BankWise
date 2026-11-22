@@ -1,6 +1,6 @@
 """Start-up for the security layer: builds everything from configuration and REFUSES to start in production
 when a guarantee cannot be met. An application entry point (API, worker, CLI) calls `build_security()` once,
-before it serves anything. Nothing in this repository calls it yet.
+before it serves anything. The API lifespan and operator CLI use this composition root.
 
 Production start-up fails (ConfigError) unless all of these hold:
 * the signing secret and the audit HMAC key are present and strong (checked by `load_app_config`);
@@ -13,7 +13,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping, Optional, Tuple
+from typing import Callable, Mapping, Optional, Tuple
 
 from bankwise.core.audit import AuditSink, HashChainedFileAuditSink, LoggingAuditSink
 from bankwise.core.auth import TokenService
@@ -24,7 +24,7 @@ from bankwise.core.errors import ConfigError
 from bankwise.core.guard import AUTH_POLICY, SecurityService
 from bankwise.core.logging import configure_logging
 from bankwise.core.rate_limit import InMemoryRateLimiter
-from bankwise.core.security import Authorizer, safe_output_path
+from bankwise.core.security import Authorizer, Principal, safe_output_path
 from bankwise.core.storage import SecureFileStore
 
 
@@ -39,7 +39,8 @@ class SecurityRuntime:
 
 
 def build_security(directory: Optional[Path] = None, environ: Optional[Mapping[str, str]] = None,
-                   root: Optional[Path] = None) -> SecurityRuntime:
+                   root: Optional[Path] = None,
+                   principal_validator: Optional[Callable[[Principal], None]] = None) -> SecurityRuntime:
     """`root` is the directory that relative paths in the config (storage, audit) resolve against; it defaults to
     the process working directory."""
     source = os.environ if environ is None else environ
@@ -78,6 +79,7 @@ def build_security(directory: Optional[Path] = None, environ: Optional[Mapping[s
         authorizer,
         InMemoryRateLimiter(config.rate_limits),
         sink,
+        principal_validator=principal_validator,
     )
     store = SecureFileStore(config.storage, root=base) if config.storage is not None else None
     return SecurityRuntime(config, service, sink, store, authorizer, tuple(warnings))

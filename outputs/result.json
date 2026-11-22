@@ -1,0 +1,133 @@
+{
+  "side": "both",
+  "first_name": "محمد",
+  "other_names": "ناصر على حسن حسونه",
+  "address_line1": "المرحلة الثالثة جاهز - الشيخ زايد",
+  "address_line2": "الاسماعيليه ثالث - الاسماعيلية",
+  "birth_date": "2005-05-01",
+  "national_id": "30505011900835",
+  "serial": "IX3254438",
+  "job": "طالب",
+  "gender": "ذكر",
+  "religion": "مسلم",
+  "marital_status": "أعزب",
+  "issue_date": "2021-07",
+  "expiry_date": "2028-07-05",
+  "all_text_lines": [
+    "2005-05-01",
+    "محمد",
+    "ناصر على حسن حسونه",
+    "المرحلة الثالثة جاهز - الشيخ زايد",
+    "الاسماعيليه ثالث - الاسماعيلية",
+    "IX3254438",
+    "2021-07",
+    "2028-07-05",
+    "طالب",
+    "ذكر مسلم أعزب"
+  ],
+  "unreadable": [],
+  "validation": {
+    "national_id": {
+      "status": "valid_structure",
+      "errors": [],
+      "decoded": {
+        "birth_date": "2005-05-01",
+        "governorate_code": "19",
+        "governorate": "Ismailia",
+        "gender": "male"
+      }
+    },
+    "birth_date_vs_national_id": "match",
+    "gender_vs_national_id": "match",
+    "national_id_front_vs_back": "match",
+    "expiry_state": "valid_until_future",
+    "date_order_issues": [],
+    "serial_pattern_ok": true,
+    "field_status": {
+      "national_id": "ok",
+      "birth_date": "ok",
+      "first_name": "low_confidence",
+      "other_names": "ok",
+      "address_line1": "ok",
+      "address_line2": "low_confidence",
+      "serial": "ok",
+      "issue_date": "ok",
+      "expiry_date": "ok",
+      "job": "ok",
+      "gender": "ok",
+      "religion": "ok",
+      "marital_status": "ok"
+    },
+    "field_flags": {
+      "national_id": [
+        "confirmed_on_both_sides"
+      ],
+      "birth_date": [
+        "separator_inferred"
+      ],
+      "first_name": [
+        "ocr_junk_removed",
+        "reread_used"
+      ],
+      "address_line1": [
+        "ocr_junk_removed"
+      ],
+      "address_line2": [
+        "ocr_junk_removed",
+        "reread_used"
+      ],
+      "serial": [
+        "serial_reader_disagreement"
+      ],
+      "issue_date": [
+        "separator_inferred"
+      ],
+      "expiry_date": [
+        "separator_inferred"
+      ]
+    },
+    "unresolved": [],
+    "input_errors": [],
+    "note": "Structural/consistency checks only. This result does not establish that the document is genuine or that it belongs to the person presenting it."
+  },
+  "decision": {
+    "status": "MANUAL_REVIEW",
+    "reasons": [
+      "weak_read:first_name"
+    ],
+    "review_flags": [
+      "weak_read:first_name",
+      "weak_read:address_line2"
+    ],
+    "ocr_quality": "degraded",
+    "data_consistency": "consistent",
+    "document_authenticity": "not_assessed",
+    "note": "OCR and structural checks only; not proof of genuineness or of who is presenting the card."
+  },
+  "diagnostics": {
+    "attempt": 1,
+    "image_quality": {
+      "front": {
+        "width": 1600,
+        "height": 1017,
+        "blur_score": 278.1,
+        "mean_brightness": 160.7,
+        "issues": []
+      },
+      "back": {
+        "width": 1600,
+        "height": 981,
+        "blur_score": 654.4,
+        "mean_brightness": 186.6,
+        "issues": []
+      }
+    },
+    "device": {
+      "ar": "cuda",
+      "en": "cuda"
+    },
+    "ocr_calls": 29,
+    "inference_ms": 1333.1,
+    "processing_ms": 1394.2
+  }
+}

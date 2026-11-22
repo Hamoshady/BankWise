@@ -1,0 +1,11 @@
+{
+  "ui_cases": 12,
+  "exact_answers_and_citations_match": true,
+  "unit_and_backend_tests_passed": 717,
+  "real_model_tests_passed": 4,
+  "health_http_status": {
+    "api": 200,
+    "streamlit": 200,
+    "llama": 200
+  }
+}

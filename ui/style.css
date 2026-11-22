@@ -1,0 +1,65 @@
+/* Local, native Streamlit widgets. No external fonts or analytics. */
+html, body, [class*="css"], .stApp {font-family: Tahoma, Arial, sans-serif;}
+.stApp {background:#f5f7f9;}
+[data-testid="stMainBlockContainer"] {max-width:1280px;padding-top:2.4rem;padding-bottom:3rem;direction:rtl;}
+[data-testid="stSidebar"] {background:#112d39;border-right:0;direction:rtl;}
+[data-testid="stSidebar"] * {color:#e2eeee;}
+[data-testid="stSidebar"] input {color:#172e3c!important;}
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] {direction:rtl;}
+[data-testid="stSidebar"] [data-testid="stRadio"] label {padding:8px 0;}
+[data-testid="stSidebar"] button {background:#21404b;border-color:#47606a;color:white;}
+[data-testid="stHeader"] {background:transparent;}
+#MainMenu, footer {visibility:hidden;}
+h1,h2,h3 {letter-spacing:-.6px;font-weight:700!important;}
+h1 {font-size:2.1rem!important;}
+h3 {font-size:1.15rem!important;}
+p {line-height:1.85;}
+.brand {display:flex;align-items:center;gap:13px;direction:ltr;margin:6px 0 28px;}
+.brand-mark {background:#b9e5c8;color:#143b38!important;font-weight:900;font-size:22px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;}
+.brand-name {font-size:23px;font-weight:bold;letter-spacing:-.5px;color:white;}
+.brand-sub {font-size:10px;letter-spacing:2.6px;color:#9db9bb!important;margin-top:3px;}
+.eyebrow {font-size:11px;letter-spacing:2px;color:#527178;text-transform:uppercase;margin-bottom:8px;direction:ltr;text-align:right;}
+.hero {background:linear-gradient(115deg,#173d4b,#0e514b);color:#fff;border-radius:22px;padding:30px 34px;margin:15px 0 24px;position:relative;overflow:hidden;}
+.hero:after {content:"";position:absolute;width:230px;height:230px;border:40px solid #ffffff08;border-radius:50%;left:-80px;top:-80px;pointer-events:none;}
+.hero h2 {color:#fff;font-size:26px;margin:0 0 8px;}
+.hero p {color:#d0e4e1;max-width:650px;margin:0;font-size:14px;}
+.pill {display:inline-block;font-size:11px;padding:5px 11px;border-radius:40px;background:#ebf5ee;color:#2c6650;margin-bottom:12px;}
+.demo-pill {background:#fff0d1;color:#75541c;}
+.balance {background:#173b46;border-radius:20px;padding:28px;color:white;margin-bottom:18px;min-height:188px;}
+.balance .amount {font:700 36px Arial,sans-serif;direction:ltr;text-align:right;margin:16px 0;}
+.balance small {color:#c0d6d5;}
+.muted {color:#71818a;font-size:13px;}
+.login-intro {padding:45px 25px 30px;}
+.login-intro h1 {font-size:42px!important;line-height:1.5;}
+.login-intro p {color:#617580;font-size:16px;}
+.feature {border-top:1px solid #dce4e7;padding:16px 0;font-size:15px;}
+[data-testid="stMetric"] {background:white;border:1px solid #e3eaed;border-radius:16px;padding:18px;}
+[data-testid="stMetricValue"] {direction:ltr;text-align:right;}
+[data-testid="stVerticalBlockBorderWrapper"]>div {border-radius:16px!important;}
+[data-testid="stForm"] {background:#fff;border-radius:18px;padding:24px;}
+[data-testid="stTextInput"] input {text-align:right;}
+[data-testid="stChatMessage"] {background:#fff;border:1px solid #e1e9eb;border-radius:16px;}
+[data-testid="stChatMessage"] p {text-align:right;}
+[data-testid="stChatInput"] textarea {direction:rtl;}
+[data-testid="stButton"] button, [data-testid="stFormSubmitButton"] button {border-radius:10px;min-height:43px;}
+[data-testid="stDataFrame"] {direction:rtl;}
+[data-testid="stAlert"] {direction:rtl;border-radius:12px;}
+code, pre {direction:ltr;text-align:left;}
+@media(max-width:700px){[data-testid="stMainBlockContainer"]{padding-top:1.2rem;} .hero{padding:22px;} .login-intro{padding:8px;} .login-intro h1{font-size:30px!important;} .balance .amount{font-size:28px;}}
+/* Calm banking workspace: consistent surfaces, readable Arabic, restrained accents. */
+.stApp {background:#f3f5f4;color:#18352f;}
+[data-testid="stSidebar"] {background:#102f29;}
+[data-testid="stMainBlockContainer"] {max-width:1200px;}
+.hero {background:linear-gradient(120deg,#183c32,#245d49);box-shadow:0 12px 32px #173b4610;}
+.balance {background:linear-gradient(135deg,#193b32,#2b5947);box-shadow:0 8px 24px #173b4615;min-height:200px;}
+.balance .amount {font-size:40px;letter-spacing:1px;}
+.login-intro {border-radius:24px;background:linear-gradient(150deg,#e5eee7,#f4f6f3);padding:36px;margin-top:12px;}
+.login-intro .pill {background:#d2e4d5;color:#24553e;}
+[data-testid="stForm"] {border:1px solid #dce5de;box-shadow:0 4px 16px #173b4605;}
+[data-testid="stMetric"] {border-color:#dce5de;box-shadow:0 4px 12px #173b4605;}
+button[kind="primary"] {background:#245c46;border-color:#245c46;color:#fff;}
+button[kind="primary"]:hover {background:#194632;border-color:#194632;}
+[data-testid="stSidebar"] [data-testid="stRadio"] label {border-radius:10px;padding:9px 12px;}
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover {background:#ffffff10;}
+[data-testid="stTextInput"] input[type="password"] {direction:ltr;}
+@media(max-width:700px){.login-intro{padding:20px}.balance .amount{font-size:30px}}

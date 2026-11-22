@@ -1,0 +1,10 @@
+# Isolated comparison image; does not replace the serving API image.
+FROM bankwise-ai:semantic
+USER root
+COPY requirements-ocr-paddle.txt /tmp/requirements-ocr-paddle.txt
+RUN python -m pip install --no-cache-dir -r /tmp/requirements-ocr-paddle.txt
+ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
+USER root
+# PaddleX's OCR extra currently requires the OpenCV contrib wheel (libGL-linked).
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libgomp1 && rm -rf /var/lib/apt/lists/*
+USER bankwise
