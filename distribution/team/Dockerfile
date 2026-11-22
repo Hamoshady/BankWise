@@ -9,10 +9,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     BANKWISE_OCR_ALLOW_CPU_FALLBACK=0
 
 WORKDIR /app
+COPY distribution/team/requirements-api.lock /tmp/requirements-api.lock
 # CPU wheels are only installed inside this isolated image, never on the developer's machine.
-RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir torch==2.15.0 torchvision==0.29.2 -c /tmp/requirements-api.lock --index-url https://download.pytorch.org/whl/cpu
 COPY requirements.txt ./
-RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt
+RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir -r requirements.txt -c /tmp/requirements-api.lock
 COPY pyproject.toml ./
 COPY src/ ./src/
 RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir --no-deps . \
@@ -28,7 +29,7 @@ CMD ["uvicorn", "bankwise.api.main:create_app", "--factory", "--host", "0.0.0.0"
 
 USER root
 COPY requirements-semantic.txt /tmp/requirements-semantic.txt
-RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir -r /tmp/requirements-semantic.txt
+RUN python -m pip install --timeout 120 --retries 10 --no-cache-dir -r /tmp/requirements-semantic.txt -c /tmp/requirements-api.lock
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
 COPY configs/local_llm_manifest.json /tmp/llm-manifest.json
 COPY distribution/team/install_llama.py /tmp/install_llama.py
