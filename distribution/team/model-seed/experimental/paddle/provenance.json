@@ -1,0 +1,20 @@
+{
+  "source": "https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec",
+  "files": [
+    [
+      "inference.json",
+      217712,
+      "d43832804d89c0e18d59f8446a3babd0ef60c44bc335efddac3176caf71d50af"
+    ],
+    [
+      "inference.pdiparams",
+      7922839,
+      "4b4271fd1dd89a40b2056e1a42e58de7c0df2fdcf1a97ca9a8916d7ec45f9143"
+    ],
+    [
+      "inference.yml",
+      6165,
+      "21368419e6c016c31db55d316d59e11c128e1913e6e6fe10287084710043d3a6"
+    ]
+  ]
+}

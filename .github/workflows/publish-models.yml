@@ -1,0 +1,58 @@
+name: Publish verified BankWise model weights
+on:
+  workflow_dispatch:
+  push:
+    branches: [share/full-project-20261122]
+    paths:
+      - configs/team_models.json
+      - distribution/team/model-seed/**
+      - scripts/team_models.py
+      - .github/workflows/publish-models.yml
+permissions:
+  contents: write
+concurrency:
+  group: bankwise-model-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Fetch and verify exact weights
+        run: python scripts/team_models.py acquire
+      - name: Build release assets
+        run: python scripts/team_models.py pack
+      - name: Publish assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          TAG=$(python -c 'import json; print(json.load(open("configs/team_models.json"))["release"])')
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --target "$GITHUB_SHA" --draft --title "BankWise model weights" --notes "Verified Qwen3.5, EasyOCR, E5, and optional PaddleOCR/YOLO/CRNN checkpoints. Download all assets and run scripts/team_models.py install. Licenses and provenance are included."
+          gh release upload "$TAG" model_downloads/* --clobber
+          gh release edit "$TAG" --draft=false
+      - name: Record publication status
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json,os,subprocess,base64
+          repo=os.environ['GH_REPO']; branch='model-publication-status'
+          ref='repos/'+repo+'/git/refs/heads/'+branch
+          check=subprocess.run(['gh','api',ref],capture_output=True)
+          if check.returncode:
+              subprocess.run(['gh','api','repos/'+repo+'/git/refs','-f','ref=refs/heads/'+branch,'-f','sha='+os.environ['GITHUB_SHA']],check=True,stdout=subprocess.DEVNULL)
+          path='repos/'+repo+'/contents/model-publication.json'
+          old=subprocess.run(['gh','api',path+'?ref='+branch],capture_output=True,text=True)
+          record={'status':os.environ['JOB_STATUS'],'source_sha':os.environ['GITHUB_SHA'],'run_url':'https://github.com/'+repo+'/actions/runs/'+os.environ['GITHUB_RUN_ID']}
+          payload={'message':'Record model publication result','branch':branch,'content':base64.b64encode((json.dumps(record,indent=2)+'\n').encode()).decode()}
+          if old.returncode==0:payload['sha']=json.loads(old.stdout)['sha']
+          subprocess.run(['gh','api','--method','PUT',path,'--input','-'],input=json.dumps(payload),text=True,check=True,stdout=subprocess.DEVNULL)
+          PY

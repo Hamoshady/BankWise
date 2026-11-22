@@ -28,3 +28,8 @@ dist/
 *.egg-info/
 .coverage
 htmlcov/
+
+# Downloaded release assets and local team launcher settings
+model_downloads/
+.team.env
+.team-snapshot/
