@@ -130,3 +130,10 @@ See [Streamlit setup and usage](docs/streamlit.md).
 
 The local Qwen3.5-4B GGUF / llama.cpp backend, benchmark and rollback are documented
 in [local_llm.md](docs/local_llm.md). The current model is shown under each natural-language response.
+
+## نسخة الفريق مع أوزان الموديلات وقاعدة البيانات
+
+ابدأ من [تعليمات تشغيل نسخة الفريق](docs/team_setup.md). على فرع
+`share/full-project-20261122`، أمر `python scripts/team.py start` ينزّل أوزان
+GitHub Release ويتحقق منها، ويبني الخدمات من المصدر ويستعيد snapshot في قاعدة
+مستقلة. لا تحتاج ملف Windows ZIP. الأوزان الكبيرة ليست داخل Source code ZIP.

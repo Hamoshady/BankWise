@@ -1,0 +1,74 @@
+name: bankwise-team
+x-runtime: &runtime
+  env_file: shared_snapshot/runtime.env
+  environment:
+    BANKWISE_ENV: development
+    BANKWISE_DATABASE_URL: postgresql+psycopg://bankwise:${TEAM_DB_PASSWORD:?Run scripts/team.py start}@db:5432/bankwise_ai
+    BANKWISE_DATABASE_SCHEMA: bankwise_api
+    BANKWISE_LLAMA_URL: http://127.0.0.1:8081
+    BANKWISE_RAG_MODE: semantic
+    BANKWISE_RAG_MODEL_DIR: /rag-models
+    BANKWISE_OCR_BACKEND: easyocr
+    BANKWISE_OCR_MODEL_DIR: /models
+    BANKWISE_OCR_USE_GPU: "0"
+    BANKWISE_OCR_ALLOW_CPU_FALLBACK: "0"
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: bankwise
+      POSTGRES_DB: bankwise_ai
+      POSTGRES_PASSWORD: ${TEAM_DB_PASSWORD}
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./shared_snapshot:/snapshot:ro
+      - ./distribution/windows-snapshot/restore.sh:/docker-entrypoint-initdb.d/10-restore.sh:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U bankwise -d bankwise_ai && test -f "$$PGDATA/bankwise_snapshot_restored"']
+      interval: 5s
+      retries: 120
+    restart: unless-stopped
+  initialize:
+    <<: *runtime
+    image: bankwise-team:api
+    build:
+      context: .
+      dockerfile: distribution/team/Dockerfile
+    user: root
+    volumes:
+      - outputs:/app/outputs
+      - ./shared_snapshot:/snapshot:ro
+    command: [python, /opt/team/initialize.py]
+    depends_on:
+      db: {condition: service_healthy}
+  api:
+    <<: *runtime
+    image: bankwise-team:api
+    volumes:
+      - outputs:/app/outputs
+      - ./models/ocr:/models:ro
+      - ./models/rag:/rag-models:ro
+      - ./models/llm:/llm-models:ro
+    depends_on:
+      initialize: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready',timeout=3)"]
+      start_period: 300s
+      interval: 10s
+      retries: 90
+    restart: unless-stopped
+  ui:
+    image: bankwise-team:ui
+    build:
+      context: .
+      dockerfile: distribution/team/Dockerfile.ui
+    environment:
+      BANKWISE_API_URL: http://api:8000
+    command: [streamlit, run, ui/app.py, --server.address=0.0.0.0, --server.port=8501, --server.headless=true, --browser.gatherUsageStats=false, --server.maxUploadSize=5]
+    ports: ["127.0.0.1:${TEAM_UI_PORT:-8501}:8501"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+volumes:
+  db:
+  outputs:

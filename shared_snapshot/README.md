@@ -8,4 +8,4 @@ The database dump is from `bankwise-postgres`, database `bankwise_ai`. Restore i
 
 Login passwords are stored as hashes, not recoverable plaintext. Use known credentials or reset passwords through an authorized workflow.
 
-The external model weights, Docker images and Windows ZIP are not part of this source snapshot. See the project setup and model documentation.
+Model weights are distributed through the repository release models-20261122-v1. See docs/team_setup.md and run scripts/team.py start for a source-based Docker deployment. The previous Windows ZIP and prebuilt local Docker images are not required.

@@ -1,0 +1,47 @@
+name: Check source-based team Docker build
+on:
+  workflow_dispatch:
+  push:
+    branches: [share/full-project-20261122]
+    paths:
+      - distribution/team/Dockerfile*
+      - distribution/team/install_llama.py
+      - compose.team.yaml
+      - .github/workflows/check-team-build.yml
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEAM_DB_PASSWORD: isolated-ci-database-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build without developer-local base images
+        run: docker compose -f compose.team.yaml build
+      - name: Verify CPU runtime and dependencies
+        run: |
+          docker run --rm --entrypoint python bankwise-team:api -c 'import easyocr,torch,transformers,bankwise.api.main; assert not torch.cuda.is_available(); print("CPU imports passed")'
+          docker run --rm --entrypoint /opt/llama/llama-server bankwise-team:api --version
+          docker run --rm --entrypoint python bankwise-team:ui -c 'import streamlit; print("UI dependencies passed")'
+      - name: Record build result
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          python - <<'PY'
+          import json,os,subprocess,base64
+          repo=os.environ['GH_REPO'];branch='team-build-status'
+          check=subprocess.run(['gh','api','repos/'+repo+'/git/refs/heads/'+branch],capture_output=True)
+          if check.returncode:
+              subprocess.run(['gh','api','repos/'+repo+'/git/refs','-f','ref=refs/heads/'+branch,'-f','sha='+os.environ['GITHUB_SHA']],check=True,stdout=subprocess.DEVNULL)
+          path='repos/'+repo+'/contents/team-build.json'
+          old=subprocess.run(['gh','api',path+'?ref='+branch],capture_output=True,text=True)
+          record={'status':os.environ['JOB_STATUS'],'source_sha':os.environ['GITHUB_SHA'],'run_url':'https://github.com/'+repo+'/actions/runs/'+os.environ['GITHUB_RUN_ID']}
+          payload={'message':'Record team source build result','branch':branch,'content':base64.b64encode((json.dumps(record,indent=2)+'\n').encode()).decode()}
+          if old.returncode==0:payload['sha']=json.loads(old.stdout)['sha']
+          subprocess.run(['gh','api','--method','PUT',path,'--input','-'],input=json.dumps(payload),text=True,check=True,stdout=subprocess.DEVNULL)
+          PY

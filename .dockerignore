@@ -19,3 +19,7 @@ tests
 build
 dist
 *.egg-info
+shared_snapshot
+model_downloads
+.team.env
+.team-snapshot
