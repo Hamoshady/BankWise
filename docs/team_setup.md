@@ -1,6 +1,6 @@
 # تشغيل نسخة الفريق من GitHub
 
-هذه التعليمات تخص فرع `share/full-project-20261122`، ولا تحتاج ملف Windows ZIP القديم أو أي صورة Docker مبنية على جهاز صاحب المشروع.
+هذه التعليمات تخص فرع `main`، ولا تحتاج ملف Windows ZIP القديم أو أي صورة Docker مبنية على جهاز صاحب المشروع.
 
 ## المطلوب مرة واحدة
 
@@ -16,8 +16,8 @@
 
 ```sh
 gh auth login
-gh repo clone solimanmohamed7177-arch/bankwise_ai -- --branch share/full-project-20261122 --single-branch
-cd bankwise_ai
+gh repo clone Hamoshady/BankWise -- --branch main --single-branch
+cd BankWise
 python scripts/team.py start
 ```
 
@@ -40,7 +40,7 @@ python scripts/team.py start --port 8502
 
 ## تنزيل الأوزان يدويًا بدل GitHub CLI
 
-افتح [إصدار الأوزان](https://github.com/solimanmohamed7177-arch/bankwise_ai/releases/tag/models-20261122-v1) بحساب لديه صلاحية، ونزّل **كل ملفات Assets** إلى مجلد `model_downloads` داخل المشروع: `assets.json` و`models-core.zip` وأجزاء Qwen الثلاثة. ملفات Source code ZIP/TAR ليست الأوزان.
+افتح [إصدار الأوزان](https://github.com/Hamoshady/BankWise/releases/tag/models-20261122-v1) بحساب لديه صلاحية، ونزّل **كل ملفات Assets** إلى مجلد `model_downloads` داخل المشروع: `assets.json` و`models-core.zip` وأجزاء Qwen الثلاثة. ملفات Source code ZIP/TAR ليست الأوزان.
 
 ```sh
 python scripts/team_models.py install

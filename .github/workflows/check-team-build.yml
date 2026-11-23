@@ -2,7 +2,7 @@ name: Check source-based team Docker build
 on:
   workflow_dispatch:
   push:
-    branches: [share/full-project-20261122]
+    branches: [main]
     paths:
       - distribution/team/Dockerfile*
       - distribution/team/install_llama.py

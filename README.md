@@ -1,139 +1,133 @@
-# BankWise AI — Research Banking Assistant
+# BankWise
 
-CIB official-source knowledge, PKDD99 historical banking data, and an isolated EGP simulation.
-See [real-data setup and limitations](docs/real_banking_data.md) for the current workspace.
+**An Arabic-first banking demo with local AI assistance and Egyptian National ID OCR.**
 
-﻿# BankWise AI - Egyptian National ID OCR
+BankWise combines a FastAPI backend, a Streamlit interface, PostgreSQL, document-based retrieval, and locally hosted language and OCR models. It is an educational banking simulation: balances and transactions are demo data, not connections to a live bank.
 
-Local OCR pipeline for Egyptian national ID cards using EasyOCR.
+[Getting started بالعربي](docs/team_setup.md) · [Model weights](https://github.com/Hamoshady/BankWise/releases/tag/models-20261122-v1) · [API contract](docs/api_contract.md)
 
-## Tests
-python -m pytest -q
+## What you can do
 
-## Run
-python -m id_ocr.cli run --front front.jpg --back back.jpg
+- Sign in with a username, password, and a single-use OTP. The shared development setup displays the OTP locally; it does not send a real SMS.
+- Apply for an account using front/back National ID images, OCR-assisted data entry, and KYC review.
+- Review applications and approve accounts. Newly approved accounts start at zero; authorized demo deposits are recorded as transactions.
+- Transfer between 12-digit account numbers and view balances, transaction references, receipts, and statements.
+- Ask an Arabic banking assistant questions backed by the project's document collection.
+- Run OCR experiments without changing the default production/development recognition backend.
 
-## Privacy
-Terminal output is redacted by default. Treat unredacted JSON and ID images as sensitive data.
+## Architecture
 
-## Local RAG
-
-The `bankwise.rag` package provides a local document-to-answer pipeline:
-
-1. Parse UTF-8 `.txt`/Markdown files (PDF is supported when the optional `pypdf` package is installed).
-2. Split documents into overlapping chunks and create local embeddings.
-3. Store chunks and vectors in a private SQLite database.
-4. Retrieve relevant chunks and return extractive answers with source citations.
-
-```python
-from pathlib import Path
-
-from bankwise.rag import RAGService, SQLiteVectorStore
-
-with SQLiteVectorStore(Path("outputs/rag.sqlite3")) as store:
-    rag = RAGService(store)
-    rag.ingest_file(Path("data/bank_policy.md"))
-    result = rag.answer("When is interest paid?")
-    print(result.answer)
-    print(result.citations)
+```mermaid
+flowchart LR
+    UI[Streamlit] --> API[FastAPI]
+    API --> DB[(PostgreSQL)]
+    API --> OCR[OpenCV + EasyOCR]
+    API --> RAG[E5 retrieval]
+    API --> LLM[Local Qwen3.5 via llama.cpp]
+    RAG --> DOCS[Indexed banking documents]
 ```
 
-`HashingEmbedder` is dependency-free and suitable for wiring/testing the pipeline, not production
-semantic search. For local semantic embeddings, install `sentence-transformers`, download the model
-ahead of time, and inject `SentenceTransformerEmbedder` into `RAGService`. The extractive generator
-only quotes retrieved document text; replace it with a trusted generator implementation when an
-LLM-backed answer is required. Re-ingesting a source atomically replaces its indexed chunks; use
-`delete_source(source)` to remove them.
+EasyOCR remains the default. PaddleOCR, YOLO11n field/digit detectors, and CRNN-CTC are experimental components whose weights are included for reproducibility, but are not enabled by the normal launcher.
 
+## Quick start
 
+### Prerequisites
 
-## Database and REST API
+- An Intel/AMD x86-64 machine.
+- Docker Desktop using **Linux containers / WSL2** on Windows, or Docker Engine with Compose on Linux.
+- Python **3.11 or newer**, Git, and GitHub CLI (`gh`).
+- Internet access for the initial download and Docker build.
+- Around **20 GB free disk space**. **24 GB RAM is preferred**; 16 GB may work with other applications closed, but 8/16 GB memory limits have not been benchmarked. No NVIDIA GPU is required.
 
-The backend adds PostgreSQL/Alembic persistence, login/logout, health checks, and
-owner-scoped identity requests through the existing security and local OCR services.
-See [backend setup](docs/backend_setup.md) for environment variables, migrations,
-user provisioning, Docker and retention; see [API contract](docs/api_contract.md)
-for endpoints, schemas and errors. The [roadmap](docs/roadmap.md) tracks later phases.
+Official installers: [Docker Desktop](https://www.docker.com/products/docker-desktop/) · [Python](https://www.python.org/downloads/windows/) · [Git](https://git-scm.com/install/windows) · [GitHub CLI](https://cli.github.com/).
 
-After configuring secrets, PostgreSQL and preinstalled OCR models:
+With Docker running, open PowerShell or a terminal:
 
-```bash
-python -m pip install -e .
-python -m alembic upgrade head
-python -m bankwise.database.cli create-user --username operator-one --roles identity_processor operator
-uvicorn bankwise.api.main:create_app --factory --workers 1 --no-proxy-headers --no-access-log
+```sh
+gh auth login
+gh repo clone Hamoshady/BankWise -- --branch main --single-branch
+cd BankWise
+python scripts/team.py start
 ```
 
-Run CLI provisioning/maintenance with the API stopped (one audit writer). No default
-users or credentials exist. Startup never creates or migrates tables. Interactive
-API documentation: `http://127.0.0.1:8000/docs`. The customer website has been removed; operation is API/terminal-only.
+On Linux, use `python3` if `python` is unavailable. Wait for **`BankWise ready`**, then open **http://127.0.0.1:8501/**.
 
-Backend integration tests use a disposable PostgreSQL container:
+The launcher downloads the model release, verifies SHA-256 hashes, rebuilds the services from source, and restores the included database snapshot into a separate Docker volume on first startup. Initial downloads include about **3.86 GB of model files**, plus Docker/Python dependencies. Source ZIP downloads alone do not contain the large weights.
 
-```bash
-BANKWISE_TEST_POSTGRES=1 python -m pytest -q -rs
+For a different port:
+
+```sh
+python scripts/team.py start --port 8502
 ```
 
-Private RAG is available through `/api/v1/rag` for the explicit `knowledge_user`
-role. It stores owner-scoped knowledge chunks in PostgreSQL and returns extractive
-answers with citations. Run `alembic upgrade head` (latest revision:
-`0005_assistant`) first.
-See the [RAG contract and try-it steps](docs/api_contract.md#private-knowledge--rag)
-for endpoints, limits, retention and the current retrieval-quality limitations.
+### Stop, restart, and diagnose
 
-For the already prepared Linux workstation and its existing PostgreSQL server, everyday
-startup is one command:
+Run these commands from the `BankWise` folder:
 
-```bash
-python3 scripts/local_api.py up
+```sh
+python scripts/team.py stop
+python scripts/team.py start
+python scripts/team.py status
+python scripts/team.py logs
 ```
 
-It starts PostgreSQL, rebuilds the image only when source/configs changed, applies
-migrations, recreates the container only when needed, and waits for `/health/ready`.
-See [local API startup](docs/local_api.md) for the other commands. This uses an isolated
-schema inside the existing database and the prepared Docker image; dependencies installed inside Docker. The obsolete Windows `.venv` was removed.
+Each installation has its own database. Stopping the services preserves balances and transactions. Do not delete `.team.env` or Docker volumes if you want to retain that installation's data.
 
-Local pretrained semantic RAG is available as an optional deployment using multilingual
-E5 and Qwen evidence selection. See [semantic RAG](docs/semantic_rag.md) for the offline
-setup, grounding contract, measured tests, resource requirements and limitations.
+### Login and account approval
 
-For direct local RAG without login on the prepared workstation:
+The snapshot retains existing accounts and password hashes. Obtain known login credentials from the project owner; passwords cannot be recovered from the hashes. A new signup request requires approval by an existing authorized reviewer. The reviewer account's stored plaintext credential was not confirmed against the snapshot; do not assume a default admin password exists.
 
-```bash
-python3 scripts/ask_rag.py
-```
+## Included models
 
-Reads local `knowledge/policies/*.md` with the pretrained semantic model and LLM,
-without an API server or database. Enter `exit` to finish. Restart after editing policies.
-The existing API remains authenticated; its optional client is `scripts/ask_rag_api.py`.
-See [local operation](docs/local_api.md#direct-local-rag-without-login).
+| Component | Model | Default |
+|---|---|---|
+| Assistant | Qwen3.5-4B, Q4_K_M GGUF | Yes |
+| Retrieval | multilingual-e5-small | Yes |
+| OCR | EasyOCR Arabic/English + CRAFT | Yes |
+| Alternative OCR | Arabic PP-OCRv5 mobile recognition | No |
+| Field localization | Trained YOLO11n field detector | No |
+| Numeric OCR | YOLO11n digits and lightweight CRNN-CTC | No |
 
-The new banking assistant uses a LangGraph supervisor with Info, Transfer, Loan and
-Account nodes. RAG is a cited knowledge tool within this workflow. The existing RAG
-endpoints remain available for retrieval-only clients. Banking is an isolated local
-demo, disabled by default, with persisted confirmation gates and simulated OTPs.
-See [assistant setup, API and demo walkthrough](docs/assistant.md).
+Weights are published under [Releases](https://github.com/Hamoshady/BankWise/releases). Qwen is split into release-sized parts and automatically reassembled. The package excludes unused historical Qwen2.5 weights and intermediate training checkpoints. Model origins, exact hashes, and license labels are in [the model manifest](configs/team_models.json); license notices are in [model-seed/licenses](distribution/team/model-seed/licenses).
 
-```bash
-python3 scripts/ask_assistant_api.py
-```
+## Repository guide
 
-An Arabic Streamlit workspace is available for the assistant, demo accounts,
-transfers, loans, PDF statements, policy search and authorized identity processing:
+| Path | Purpose |
+|---|---|
+| `src/bankwise/` | API, authentication, banking demo, persistence, assistant, and retrieval |
+| `src/id_ocr/` | OCR localization, preprocessing, recognition, validation, and experiments |
+| `ui/` | Streamlit application |
+| `scripts/team.py` | Docker launcher for a source checkout |
+| `scripts/team_models.py` | Verified model download, packaging, and installation |
+| `shared_snapshot/` | Database dump, runtime outputs/configuration, and supplied card examples |
+| `test_data/` | Supplied OCR examples and reference data |
+| `tests/` | Unit, integration, UI, and packaging checks |
+| `evaluation/` | Benchmark protocols and recorded results |
+| `docs/` | Setup, API, architecture, experiments, and limitations |
 
-```bash
-/usr/bin/python3 scripts/local_ui.py up
-```
+The shared snapshot includes real identity examples and runtime configuration at the owner's request. It is a local demo distribution, not a hardened public banking deployment. OCR formatting checks are not proof of document authenticity; OCR and model accuracy are not guaranteed across all cards.
 
-Open `http://127.0.0.1:8501` and sign in with your existing credentials.
-See [Streamlit setup and usage](docs/streamlit.md).
+## Documentation and verification
 
-The local Qwen3.5-4B GGUF / llama.cpp backend, benchmark and rollback are documented
-in [local_llm.md](docs/local_llm.md). The current model is shown under each natural-language response.
+- [Arabic team setup](docs/team_setup.md)
+- [Signup and review](docs/customer_onboarding.md)
+- [Login OTP](docs/two_factor_login.md)
+- [Account numbers](docs/account_numbers.md) and [transaction references](docs/transaction_references.md)
+- [OCR backends](docs/ocr_backends.md) and [numeric OCR experiments](evaluation/numeric_ocr/README.md)
+- [Local Qwen](docs/local_llm.md) and [semantic retrieval](docs/semantic_rag.md)
+- [Backend development and tests](docs/backend_setup.md)
+- [Previous development README](docs/README_previous.md)
 
-## نسخة الفريق مع أوزان الموديلات وقاعدة البيانات
+The preceding shared version passed Linux/Docker startup checks, database snapshot comparisons, model checksum verification, seven synthetic model-packaging tests, and a clean GitHub Actions Docker build. Windows has not been directly tested. See this repository's [Actions](https://github.com/Hamoshady/BankWise/actions) for results after publication; earlier results are not a claim that a new run has completed.
 
-ابدأ من [تعليمات تشغيل نسخة الفريق](docs/team_setup.md). على فرع
-`share/full-project-20261122`، أمر `python scripts/team.py start` ينزّل أوزان
-GitHub Release ويتحقق منها، ويبني الخدمات من المصدر ويستعيد snapshot في قاعدة
-مستقلة. لا تحتاج ملف Windows ZIP. الأوزان الكبيرة ليست داخل Source code ZIP.
+## Team
+
+| Member | GitHub |
+|---|---|
+| Shady / repository owner | [@Hamoshady](https://github.com/Hamoshady) |
+| Soliman | [@solimanmohamed7177-arch](https://github.com/solimanmohamed7177-arch) |
+| Mohamed Nasser | [@mohamed-nasser170](https://github.com/mohamed-nasser170) |
+| Mazen Samir | [@Mazen-samir1](https://github.com/Mazen-samir1) |
+| Aya | [@aya205-elghon](https://github.com/aya205-elghon) |
+
+Collaborator invitations are managed separately from this credits list; listing a member here does not itself grant repository access.
